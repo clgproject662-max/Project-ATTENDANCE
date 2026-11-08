@@ -58,3 +58,4 @@ if (typeof window !== 'undefined') {
     window.compareStudents = compareStudents;
     window.sortStudentsByRollNumber = sortStudentsByRollNumber;
 }
+
