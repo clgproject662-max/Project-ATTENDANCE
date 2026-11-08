@@ -1,0 +1,39 @@
+/* ==========================================================================
+   home.css - Styles for Staff Dashboard (home.html)
+   ========================================================================== */
+
+.home-card {
+    max-width: 520px;
+    width: 90%;
+    margin: 60px auto;
+    padding: 42px 32px;
+    background: rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+#userInfo {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 30px 0;
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.home-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+}
+
+.home-actions button {
+    min-width: 220px;
+    padding: 13px 28px;
+    font-size: 15px;
+    border-radius: 100px;
+}

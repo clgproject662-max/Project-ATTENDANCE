@@ -1,0 +1,45 @@
+/* ==========================================================================
+   admin.css - Styles for Admin Dashboard (admin.html)
+   ========================================================================== */
+
+.admin-card {
+    max-width: 600px;
+    width: 90%;
+    margin: 50px auto;
+    padding: 42px 32px;
+    background: rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+#userInfo {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 30px 0;
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.admin-nav-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 30px;
+}
+
+.admin-nav-grid button {
+    min-width: 170px;
+    padding: 13px 22px;
+    font-size: 14px;
+    border-radius: 100px;
+}
+
+.admin-logout-btn {
+    min-width: 160px;
+    padding: 12px 24px;
+}

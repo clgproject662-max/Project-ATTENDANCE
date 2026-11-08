@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Staff Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="header">
+        <img src="logo.png" alt="Logo" class="logo" onerror="this.src='logo.png'">
+        <h2 class="center" style="padding-left: 35%;">College Attendance System</h2>
+    </header>
+
+    <div class="container center" style="padding-top: 50px; padding-bottom: 50px;">
+        <h2 id="userInfo" style="color: #ffffff; line-height: 1.6;"></h2>
+
+        <!-- Buttons Row 1 -->
+        <div style="margin-top: 25px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <button onclick="location.href='attendance.html'" style="font-size: 16px; padding: 12px 28px; min-width: 200px;">Mark Attendance</button>
+            <button onclick="location.href='report.html'" style="font-size: 16px; padding: 12px 28px; background-color: #28a745; color: white; min-width: 200px;">Attendance Reports</button>
+            <button onclick="location.href='request-student.html'" style="font-size: 16px; padding: 12px 28px; background-color: #2563eb; color: white; min-width: 200px;">Student Registration Request</button>
+        </div>
+
+        <!-- Buttons Row 2 -->
+        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <button onclick="location.href='my-requests.html'" style="font-size: 16px; padding: 12px 28px; background-color: #7c3aed; color: white; min-width: 200px;">Request Approval Status</button>
+        </div>
+
+        <div style="margin-top: 25px;">
+            <button class="red" onclick="logout()" style="padding: 8px 24px;">Logout</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Handler for Student Registration button on Staff Dashboard
+        async function handleStaffStudentRegistration() {
+            const user = getCurrentUser();
+            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            // Check if there are approved requests waiting for registration completion
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${BASE_URL}/student-requests/my-requests`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const approvedWaiting = (data.requests || []).filter(r => r.status === 'approved' && !r.isCompleted && !r.completedStudentId);
+                    if (approvedWaiting.length > 0) {
+                        alert(`You have ${approvedWaiting.length} approved registration request(s) ready to be completed. Redirecting to My Student Registration Requests.`);
+                        window.location.href = "my-requests.html";
+                        return;
+                    }
+                }
+            } catch (e) {}
+
+            // Inform staff that registration requires prior Admin approval
+            const proceed = confirm("Student registration requires prior Admin approval.\n\nWould you like to submit a new Student Registration Request to the Admin?");
+            if (proceed) {
+                window.location.href = "request-student.html";
+            } else {
+                window.location.href = "my-requests.html";
+            }
+        }
+    </script>
+</body>
+
+</html>

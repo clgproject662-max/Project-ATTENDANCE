@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+front End/node_modules/
+backend/node_modules/
+
+# Environment variables
+.env
+backend/.env
+
+# Uploads & Media
+uploads/
+backend/uploads/
+*.tmp
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+server.log
+backend/server.log
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

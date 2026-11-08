@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Daily Report</title>
+</head>
+<body>
+    <h1>Daily Report Test</h1>
+    <p>Testing if dailyreport.js loads without errors...</p>
+    
+    <script>
+        // Test if admin session exists
+        const currentUser = {
+            username: "admin",
+            role: "admin",
+            department: "Administration"
+        };
+        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        
+        // Test basic functionality
+        console.log("✅ Test setup complete");
+        console.log("Admin user:", currentUser);
+        
+        // Test if functions exist
+        if (typeof generateDailyReport === 'function') {
+            console.log("✅ generateDailyReport function exists");
+        } else {
+            console.log("❌ generateDailyReport function missing");
+        }
+    </script>
+    
+    <!-- Load the daily report script -->
+    <script src="front End/dailyreport.js"></script>
+    
+    <script>
+        setTimeout(() => {
+            if (typeof generateDailyReport === 'function') {
+                console.log("✅ Daily report script loaded successfully");
+            } else {
+                console.log("❌ Daily report script failed to load");
+            }
+        }, 100);
+    </script>
+</body>
+</html>

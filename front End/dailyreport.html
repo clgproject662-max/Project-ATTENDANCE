@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Daily College Attendance Report</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        .daily-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .controls-section {
+            background: none;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .controls-section label {
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .controls-section input[type="date"] {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background: transparent;
+            color: white;
+        }
+
+        .controls-section input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
+        .controls-section button {
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .generate-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .generate-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .excel-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .excel-btn:hover {
+            background-color: #1e7e34;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: transparent;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: none;
+        }
+
+        .report-table th {
+            background-color: transparent;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .report-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .report-table tbody tr:hover {
+            background-color: transparent;
+        }
+
+        .dept-cell {
+            font-weight: bold;
+            background-color: transparent;
+            vertical-align: middle;
+            color: white;
+        }
+
+        .class-cell {
+            font-weight: 500;
+            color: white;
+        }
+
+        .percentage-cell {
+            font-weight: bold;
+            color: white;
+        }
+
+        .percentage-high {
+            color: #4caf50 !important;
+        }
+
+        .percentage-medium {
+            color: #ffeb3b !important;
+        }
+
+        .percentage-low {
+            color: #ff6b6b !important;
+        }
+
+        .no-data {
+            color: #b3b3b3;
+            font-style: italic;
+        }
+
+        .loading-message, .error-message, .no-data-message {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+        }
+
+        .no-data-message {
+            color: #ffeb3b;
+        }
+
+        .back-button {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .back-button button {
+            padding: 10px 20px;
+            background-color: transparent;
+            color: white;
+            border: 1px solid white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .back-button button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .controls-section {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .report-table {
+                font-size: 14px;
+            }
+            
+            .report-table th,
+            .report-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <img src="img/logo.png" alt="Logo" class="logo">
+        <h2 class="center" style="padding-left: 35%;">College Attendance System</h2>
+    </header>
+
+    <div class="daily-container">
+        <h2 id="userInfo" class="center" style="color: white; margin-bottom: 10px;"></h2>
+        <h1 class="page-title">Daily College Attendance Report</h1>
+
+        <!-- Controls Section -->
+        <div class="controls-section">
+            <label for="reportDate">Date:</label>
+            <input type="date" id="reportDate" required>
+            <button class="generate-btn" onclick="generateDailyReport()">Generate</button>
+            <button class="excel-btn" onclick="downloadPDFReport()">Download PDF</button>
+        </div>
+
+        <!-- Report Content -->
+        <div id="reportContent">
+            <div class="loading-message" id="loadingMessage" style="display: none;">
+                Loading report data...
+            </div>
+
+            <div class="error-message" id="errorMessage" style="display: none;">
+                <!-- Error message will be displayed here -->
+            </div>
+
+            <div class="no-data-message" id="noDataMessage" style="display: none;">
+                <!-- No data message will be displayed here -->
+            </div>
+
+            <table class="report-table" id="reportTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Department</th>
+                        <th>Classes</th>
+                        <th>Strength</th>
+                        <th>Present</th>
+                        <th>Absent</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTableBody">
+                    <!-- Report data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Back Button -->
+        <div class="back-button">
+            <button onclick="goBackToAdmin()">Back to Admin Panel</button>
+        </div>
+
+        <div id="messageArea" class="center" style="margin-top: 20px; color: white; font-weight: bold;">
+            <!-- Status messages will appear here -->
+        </div>
+    </div>
+
+    <script src="dailyreport.js"></script>
+
+</body>
+
+</html>

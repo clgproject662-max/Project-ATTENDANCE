@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Student Requests API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .output {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            color: #4caf50;
+        }
+        .error {
+            color: #ff6b6b;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Student Requests API Tester</h1>
+        
+        <div class="section">
+            <h2>1. Test Backend Connection</h2>
+            <button onclick="testBackend()">Test Backend Health</button>
+            <div id="backendOutput" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>2. Test Staff Authentication</h2>
+            <button onclick="loginAsStaff()">Login as Staff (cs3/cs123)</button>
+            <button onclick="loginAsAdmin()">Login as Admin (admin/admin123)</button>
+            <div id="authOutput" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>3. Submit Test Request (Staff)</h2>
+            <button onclick="submitTestRequest()">Submit Test Student Request</button>
+            <div id="submitOutput" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>4. View My Requests (Staff)</h2>
+            <button onclick="getMyRequests()">Get My Requests</button>
+            <div id="myRequestsOutput" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>5. View All Requests (Admin)</h2>
+            <button onclick="getAllRequests()">Get All Requests</button>
+            <div id="allRequestsOutput" class="output"></div>
+        </div>
+
+        <div class="section">
+            <h2>6. Approve/Reject (Admin)</h2>
+            <input type="text" id="requestIdInput" placeholder="Enter Request ID" style="padding: 8px; width: 300px; color: black;">
+            <button onclick="approveRequest()">Approve</button>
+            <button onclick="rejectRequest()">Reject</button>
+            <div id="actionOutput" class="output"></div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:5000/api';
+        let currentToken = null;
+        let currentUser = null;
+
+        // Helper to display output
+        function display(elementId, message, isError = false) {
+            const output = document.getElementById(elementId);
+            const className = isError ? 'error' : 'success';
+            output.innerHTML = `<span class="${className}">${message}</span>`;
+        }
+
+        // Test backend
+        async function testBackend() {
+            try {
+                const response = await fetch(`${BASE_URL}/health`);
+                const data = await response.json();
+                display('backendOutput', JSON.stringify(data, null, 2));
+            } catch (error) {
+                display('backendOutput', `❌ Backend Error: ${error.message}`, true);
+            }
+        }
+
+        // Login as staff
+        async function loginAsStaff() {
+            try {
+                // Simulate local login
+                currentUser = {
+                    username: "cs3",
+                    name: "CS Staff (Year 3)",
+                    role: "staff",
+                    department: "Computer Science",
+                    year: "3"
+                };
+                currentToken = "local-token-cs3";
+                
+                localStorage.setItem("currentUser", JSON.stringify(currentUser));
+                localStorage.setItem("token", currentToken);
+                
+                display('authOutput', `✅ Logged in as Staff:\n${JSON.stringify(currentUser, null, 2)}`);
+            } catch (error) {
+                display('authOutput', `❌ Login Error: ${error.message}`, true);
+            }
+        }
+
+        // Login as admin
+        async function loginAsAdmin() {
+            try {
+                currentUser = {
+                    username: "admin",
+                    name: "System Administrator",
+                    role: "admin",
+                    department: "Administration",
+                    year: "All"
+                };
+                currentToken = "local-token-admin";
+                
+                localStorage.setItem("currentUser", JSON.stringify(currentUser));
+                localStorage.setItem("token", currentToken);
+                
+                display('authOutput', `✅ Logged in as Admin:\n${JSON.stringify(currentUser, null, 2)}`);
+            } catch (error) {
+                display('authOutput', `❌ Login Error: ${error.message}`, true);
+            }
+        }
+
+        // Submit test request
+        async function submitTestRequest() {
+            if (!currentToken) {
+                display('submitOutput', '❌ Please login first!', true);
+                return;
+            }
+
+            try {
+                const testData = {
+                    studentName: "Test Student " + Date.now(),
+                    studentId: "TEST" + Date.now().toString().slice(-4),
+                    department: "Computer Science",
+                    year: "3",
+                    section: "A",
+                    reason: "Test registration request"
+                };
+
+                const response = await fetch(`${BASE_URL}/student-requests`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    display('submitOutput', `✅ Request submitted successfully!\n${JSON.stringify(data, null, 2)}`);
+                } else {
+                    display('submitOutput', `❌ Error: ${data.message}\n${JSON.stringify(data, null, 2)}`, true);
+                }
+            } catch (error) {
+                display('submitOutput', `❌ Network Error: ${error.message}`, true);
+            }
+        }
+
+        // Get my requests (staff)
+        async function getMyRequests() {
+            if (!currentToken) {
+                display('myRequestsOutput', '❌ Please login first!', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_URL}/student-requests/my-requests`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    display('myRequestsOutput', `✅ Found ${data.requests?.length || 0} requests:\n${JSON.stringify(data, null, 2)}`);
+                } else {
+                    display('myRequestsOutput', `❌ Error: ${data.message}\n${JSON.stringify(data, null, 2)}`, true);
+                }
+            } catch (error) {
+                display('myRequestsOutput', `❌ Network Error: ${error.message}`, true);
+            }
+        }
+
+        // Get all requests (admin)
+        async function getAllRequests() {
+            if (!currentToken) {
+                display('allRequestsOutput', '❌ Please login first!', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_URL}/student-requests/all`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    display('allRequestsOutput', `✅ Found ${data.requests?.length || 0} requests:\nSummary: ${JSON.stringify(data.summary)}\n\nRequests:\n${JSON.stringify(data.requests, null, 2)}`);
+                } else {
+                    display('allRequestsOutput', `❌ Error: ${data.message}\n${JSON.stringify(data, null, 2)}`, true);
+                }
+            } catch (error) {
+                display('allRequestsOutput', `❌ Network Error: ${error.message}`, true);
+            }
+        }
+
+        // Approve request
+        async function approveRequest() {
+            if (!currentToken) {
+                display('actionOutput', '❌ Please login first!', true);
+                return;
+            }
+
+            const requestId = document.getElementById('requestIdInput').value.trim();
+            if (!requestId) {
+                display('actionOutput', '❌ Please enter a request ID!', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_URL}/student-requests/${requestId}/approve`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    display('actionOutput', `✅ Request approved!\n${JSON.stringify(data, null, 2)}`);
+                } else {
+                    display('actionOutput', `❌ Error: ${data.message}\n${JSON.stringify(data, null, 2)}`, true);
+                }
+            } catch (error) {
+                display('actionOutput', `❌ Network Error: ${error.message}`, true);
+            }
+        }
+
+        // Reject request
+        async function rejectRequest() {
+            if (!currentToken) {
+                display('actionOutput', '❌ Please login first!', true);
+                return;
+            }
+
+            const requestId = document.getElementById('requestIdInput').value.trim();
+            if (!requestId) {
+                display('actionOutput', '❌ Please enter a request ID!', true);
+                return;
+            }
+
+            const reason = prompt("Enter rejection reason:");
+            if (!reason) {
+                display('actionOutput', '❌ Rejection reason required!', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_URL}/student-requests/${requestId}/reject`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify({ reason })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    display('actionOutput', `✅ Request rejected!\n${JSON.stringify(data, null, 2)}`);
+                } else {
+                    display('actionOutput', `❌ Error: ${data.message}\n${JSON.stringify(data, null, 2)}`, true);
+                }
+            } catch (error) {
+                display('actionOutput', `❌ Network Error: ${error.message}`, true);
+            }
+        }
+
+        // Auto-load current user on page load
+        window.onload = function() {
+            const user = localStorage.getItem("currentUser");
+            const token = localStorage.getItem("token");
+            
+            if (user && token) {
+                currentUser = JSON.parse(user);
+                currentToken = token;
+                display('authOutput', `✅ Already logged in as:\n${JSON.stringify(currentUser, null, 2)}`);
+            }
+        };
+    </script>
+</body>
+</html>

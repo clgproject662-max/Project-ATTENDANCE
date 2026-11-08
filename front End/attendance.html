@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Roster</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="header">
+        <img src="logo.png" alt="Logo" class="logo" onerror="this.src='logo.png'">
+        <h2 class="center" style="padding-left: 35%;">College Attendance System</h2>
+    </header>
+
+    <div class="container" style="max-width: 900px; margin: 30px auto; padding: 20px; color: #ffffff;">
+        <h3 class="center" style="margin-bottom: 5px;">Daily Attendance</h3>
+        <div id="classBanner" class="center" style="margin-bottom: 15px; font-size: 16px; font-weight: 600; color: #e2e8f0;"></div>
+
+        <div class="center" style="margin-bottom: 15px;">
+            <label for="attendanceDate" style="margin-right: 8px; font-weight: 600;">Date:</label>
+            <input type="date" id="attendanceDate" onchange="renderAttendance()" disabled title="Date fixed for staff - only admin can change dates">
+            <div id="attendanceStats"></div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 10%;">Serial</th>
+                    <th style="width: 25%;">Register No</th>
+                    <th style="width: 40%;">Name</th>
+                    <th style="width: 25%;">Status</th>
+                </tr>
+            </thead>
+            <tbody id="attendanceBody">
+                <tr>
+                    <td colspan="4" style="padding: 20px;">Loading student list...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="center" style="margin-top: 25px;">
+            <button onclick="submitAttendance()" style="padding: 10px 28px; font-size: 15px; font-weight: 600;">Submit Attendance</button>
+            <br><br>
+            <button class="red" onclick="location.href='home.html'" style="padding: 8px 22px;">Back to Home</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,71 @@
+/* ==========================================================================
+   excelupload.css - Styles for Student Excel Upload Page (excelupload.html)
+   ========================================================================== */
+
+.upload-card {
+    max-width: 560px;
+    width: 90%;
+    margin: 40px auto;
+    padding: 36px 30px;
+    background: rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.upload-card h2 {
+    margin: 0 0 20px 0;
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+#uploadForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+    text-align: left;
+}
+
+#uploadForm label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    margin-top: 6px;
+}
+
+#uploadForm select,
+#uploadForm input[type="file"] {
+    width: 100%;
+    margin: 0;
+}
+
+#uploadForm input[type="file"] {
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px dashed rgba(255, 255, 255, 0.45);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#uploadForm button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+}
+
+#result {
+    margin-top: 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+#result table {
+    margin: 14px auto;
+    max-width: 100%;
+}

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Detailed Report System</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+        .test-section { margin: 20px 0; padding: 15px; background: white; border-radius: 8px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>College Attendance System - Report Test</h1>
+    
+    <div class="test-section">
+        <h3>Test Results:</h3>
+        <div id="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Navigation Links:</h3>
+        <p><a href="index.html">Login Page</a></p>
+        <p><a href="admin.html">Admin Dashboard</a> (admin/admin123)</p>
+        <p><a href="home.html">Staff Dashboard</a> (cs3/cs123)</p>
+        <p><a href="dailyreport.html">Daily Report</a> (Admin only)</p>
+        <p><a href="report.html">Detailed Report</a> (Staff & Admin)</p>
+    </div>
+
+    <script>
+        function runTests() {
+            const results = [];
+            
+            // Test localStorage functions
+            try {
+                // Test if we can access localStorage
+                const testData = { test: 'value' };
+                localStorage.setItem('test', JSON.stringify(testData));
+                const retrieved = JSON.parse(localStorage.getItem('test'));
+                if (retrieved.test === 'value') {
+                    results.push({ type: 'pass', message: '✅ localStorage is working properly' });
+                } else {
+                    results.push({ type: 'fail', message: '❌ localStorage read/write failed' });
+                }
+                localStorage.removeItem('test');
+            } catch (e) {
+                results.push({ type: 'fail', message: '❌ localStorage not available: ' + e.message });
+            }
+
+            // Test if default students exist
+            try {
+                const students = JSON.parse(localStorage.getItem('students')) || [];
+                if (students.length > 0) {
+                    results.push({ type: 'pass', message: `✅ Found ${students.length} students in localStorage` });
+                    
+                    // Check departments
+                    const departments = [...new Set(students.map(s => s.department))];
+                    results.push({ type: 'info', message: `📊 Departments: ${departments.join(', ')}` });
+                    
+                    // Check years
+                    const years = [...new Set(students.map(s => s.year))];
+                    results.push({ type: 'info', message: `📅 Years: ${years.join(', ')}` });
+                } else {
+                    results.push({ type: 'fail', message: '❌ No students found. Need to initialize default students.' });
+                }
+            } catch (e) {
+                results.push({ type: 'fail', message: '❌ Error reading students: ' + e.message });
+            }
+
+            // Test attendance ledger
+            try {
+                const ledger = JSON.parse(localStorage.getItem('all_attendance_ledger')) || [];
+                if (ledger.length > 0) {
+                    results.push({ type: 'pass', message: `✅ Found ${ledger.length} attendance records` });
+                    
+                    // Show recent records
+                    const recentDates = [...new Set(ledger.map(l => l.date))].slice(-3);
+                    results.push({ type: 'info', message: `📝 Recent attendance dates: ${recentDates.join(', ')}` });
+                } else {
+                    results.push({ type: 'info', message: '📝 No attendance records yet. Submit some attendance first.' });
+                }
+            } catch (e) {
+                results.push({ type: 'fail', message: '❌ Error reading attendance ledger: ' + e.message });
+            }
+
+            // Test users
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                if (currentUser) {
+                    results.push({ type: 'pass', message: `✅ Logged in as: ${currentUser.name || currentUser.username} (${currentUser.role})` });
+                } else {
+                    results.push({ type: 'info', message: '👤 Not logged in. Please login first to test reports.' });
+                }
+            } catch (e) {
+                results.push({ type: 'info', message: '👤 No current user session' });
+            }
+
+            // Test XLSX library
+            if (typeof XLSX !== 'undefined') {
+                results.push({ type: 'pass', message: '✅ Excel export library (XLSX) is loaded' });
+            } else {
+                results.push({ type: 'fail', message: '❌ Excel export library (XLSX) not loaded' });
+            }
+
+            // Display results
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = results.map(r => 
+                `<div class="result ${r.type}">${r.message}</div>`
+            ).join('');
+        }
+
+        // Initialize default students if needed
+        function initializeTestData() {
+            const DEFAULT_STUDENTS = [
+                { serial: 1, studentId: "21CS001", studentName: "Aravind Kumar", name: "Aravind Kumar", department: "Computer Science", year: "3" },
+                { serial: 2, studentId: "21CS002", studentName: "Bhavani S", name: "Bhavani S", department: "Computer Science", year: "3" },
+                { serial: 3, studentId: "21CS003", studentName: "Chandran M", name: "Chandran M", department: "Computer Science", year: "3" },
+                { serial: 4, studentId: "21IT001", studentName: "Divya R", name: "Divya R", department: "Information Technology", year: "1" },
+                { serial: 5, studentId: "21IT002", studentName: "Ganesh P", name: "Ganesh P", department: "Information Technology", year: "2" },
+                { serial: 6, studentId: "21TM001", studentName: "Harini K", name: "Harini K", department: "Tamil", year: "1" },
+                { serial: 7, studentId: "21EN001", studentName: "Karthik V", name: "Karthik V", department: "English", year: "2" }
+            ];
+
+            let students = JSON.parse(localStorage.getItem("students")) || [];
+            if (students.length === 0) {
+                localStorage.setItem("students", JSON.stringify(DEFAULT_STUDENTS));
+                console.log("Initialized default test students");
+            }
+        }
+
+        // Create sample attendance for testing
+        function createSampleAttendance() {
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            const dayBefore = new Date(today);
+            dayBefore.setDate(today.getDate() - 2);
+
+            const sampleRecords = [
+                {
+                    date: today.toISOString().split('T')[0],
+                    department: "Computer Science",
+                    year: "3",
+                    records: [
+                        { studentId: "21CS001", studentName: "Aravind Kumar", status: "present" },
+                        { studentId: "21CS002", studentName: "Bhavani S", status: "present" },
+                        { studentId: "21CS003", studentName: "Chandran M", status: "absent" }
+                    ]
+                },
+                {
+                    date: yesterday.toISOString().split('T')[0],
+                    department: "Computer Science",
+                    year: "3",
+                    records: [
+                        { studentId: "21CS001", studentName: "Aravind Kumar", status: "present" },
+                        { studentId: "21CS002", studentName: "Bhavani S", status: "absent" },
+                        { studentId: "21CS003", studentName: "Chandran M", status: "present" }
+                    ]
+                }
+            ];
+
+            localStorage.setItem("all_attendance_ledger", JSON.stringify(sampleRecords));
+            alert("✅ Sample attendance data created for testing!");
+        }
+
+        // Run tests on page load
+        window.onload = function() {
+            initializeTestData();
+            runTests();
+        };
+    </script>
+
+    <div class="test-section">
+        <h3>Quick Actions:</h3>
+        <button onclick="createSampleAttendance()">Create Sample Attendance Data</button>
+        <button onclick="runTests()">Re-run Tests</button>
+        <button onclick="localStorage.clear(); location.reload();">Clear All Data & Reload</button>
+    </div>
+</body>
+</html>

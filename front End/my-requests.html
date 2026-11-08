@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Student Registration Requests - Staff</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .requests-container {
+            max-width: 1100px;
+            margin: 25px auto;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+        }
+
+        .page-title {
+            color: white;
+            font-size: 26px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .staff-badge {
+            text-align: center;
+            color: #e2e8f0;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        .staff-badge strong {
+            color: #fde047;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 240px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 9px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .filter-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-box select {
+            padding: 8px 14px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 14px;
+        }
+
+        .filter-box select option {
+            background: #1e293b;
+            color: white;
+        }
+
+        .btn-refresh {
+            padding: 8px 18px;
+            border-radius: 18px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-refresh:hover {
+            background: #1d4ed8;
+        }
+
+        .requests-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .requests-table th {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .requests-table td {
+            padding: 12px 14px;
+            color: white;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            vertical-align: middle;
+        }
+
+        .requests-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.25);
+            color: #fbbf24;
+            border: 1px solid #f59e0b;
+        }
+
+        .status-approved {
+            background: rgba(34, 197, 94, 0.25);
+            color: #4ade80;
+            border: 1px solid #22c55e;
+        }
+
+        .status-rejected {
+            background: rgba(239, 68, 68, 0.25);
+            color: #f87171;
+            border: 1px solid #ef4444;
+        }
+
+        .status-completed {
+            background: rgba(56, 189, 248, 0.25);
+            color: #38bdf8;
+            border: 1px solid #0284c7;
+        }
+
+        .btn-complete {
+            background-color: #16a34a;
+            color: white;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4);
+        }
+
+        .btn-complete:hover {
+            background-color: #15803d;
+            transform: translateY(-1px);
+        }
+
+        .btn-new-request {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .btn-new-request:hover {
+            background-color: #1d4ed8;
+        }
+
+        .rejection-box {
+            color: #fca5a5;
+            font-size: 12px;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            color: white;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 10px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #38bdf8;
+            font-size: 18px;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-form-group {
+            margin-bottom: 14px;
+        }
+
+        .modal-form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #cbd5e1;
+            margin-bottom: 4px;
+        }
+
+        .modal-form-group input {
+            width: 100%;
+            padding: 9px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 6px;
+            color: white;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .modal-form-group input:disabled {
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 14px;
+        }
+
+        .modal-footer button {
+            padding: 8px 18px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .requests-container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            .requests-table th, .requests-table td {
+                padding: 8px 6px;
+                font-size: 12px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <img src="logo.png" alt="Logo" class="logo" onerror="this.src='logo.png'">
+        <h2 class="center" style="padding-left: 35%;">College Attendance System</h2>
+    </header>
+
+    <div class="requests-container">
+        <h1 class="page-title">My Student Registration Requests</h1>
+
+        <div class="staff-badge" id="staffBadge">
+            Staff: <strong id="staffBadgeName">...</strong> | Assigned Class: <strong id="staffBadgeClass">...</strong>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by Register Number or Student Name...">
+            </div>
+            <div class="filter-box">
+                <select id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="completed">Completed</option>
+                </select>
+                <button class="btn-refresh" onclick="loadMyRequests()">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <div id="tableContainer">
+            <div style="text-align: center; color: white; padding: 40px;">Loading your requests...</div>
+        </div>
+
+        <div style="text-align: center; margin-top: 25px;">
+            <button class="btn-new-request" onclick="location.href='request-student.html'">+ New Registration Request</button>
+            <button onclick="location.href='home.html'" style="padding: 10px 22px; background: transparent; color: white; border: 2px solid white; border-radius: 20px; cursor: pointer; font-size: 14px;">Back to Dashboard</button>
+        </div>
+    </div>
+
+    <!-- Complete Registration Modal -->
+    <div id="completeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Complete Student Registration</h3>
+                <button class="modal-close" onclick="closeCompleteModal()">&times;</button>
+            </div>
+            <form id="completeForm" onsubmit="submitCompleteRegistration(event)">
+                <input type="hidden" id="modalRequestId">
+
+                <div class="modal-form-group">
+                    <label>Register Number / Roll Number:</label>
+                    <input type="text" id="modalStudentId" readonly disabled style="font-weight: bold; color: #67e8f9;">
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Student Name (Verify or edit permitted details):</label>
+                    <input type="text" id="modalStudentName" required>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Assigned Department:</label>
+                    <input type="text" id="modalDepartment" readonly disabled>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Academic Year:</label>
+                    <input type="text" id="modalYear" readonly disabled>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Section (Optional):</label>
+                    <input type="text" id="modalSection" placeholder="e.g. A">
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Phone (Optional):</label>
+                    <input type="tel" id="modalPhone" placeholder="Student phone number">
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Parent Phone (Optional):</label>
+                    <input type="tel" id="modalParentPhone" placeholder="Parent phone number">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" onclick="closeCompleteModal()" style="background: #64748b; color: white;">Cancel</button>
+                    <button type="submit" id="btnConfirmRegister" style="background: #16a34a; color: white;">Confirm & Register Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let myRequests = [];
+        let activeRequest = null;
+
+        function checkAuth() {
+            const user = getCurrentUser();
+            if (!user) {
+                alert("Please login first.");
+                window.location.href = "index.html";
+                return null;
+            }
+            if (user.role === "admin") {
+                window.location.href = "admin-student-requests.html";
+                return null;
+            }
+            return user;
+        }
+
+        async function loadMyRequests() {
+            const user = checkAuth();
+            if (!user) return;
+
+            const nameEl = document.getElementById("staffBadgeName");
+            const classEl = document.getElementById("staffBadgeClass");
+            if (nameEl) nameEl.textContent = user.name || user.username;
+            if (classEl) {
+                const prefix = (user.department || '').toLowerCase().includes('computer') ? 'CS' : (user.department || 'CS').substring(0, 3).toUpperCase();
+                classEl.textContent = `${prefix}${user.year || '1'} (${user.department} - Year ${user.year})`;
+            }
+
+            const container = document.getElementById("tableContainer");
+            container.innerHTML = '<div style="text-align: center; color: white; padding: 40px;">Fetching registration requests...</div>';
+
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${BASE_URL}/student-requests/my-requests`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    myRequests = data.requests || [];
+                    renderRequestsTable();
+                } else {
+                    const errData = await res.json().catch(() => ({}));
+                    container.innerHTML = `<div style="text-align: center; color: #fca5a5; padding: 30px;">❌ ${errData.message || 'Failed to load requests from server'}</div>`;
+                }
+            } catch (err) {
+                console.error("Error fetching requests:", err);
+                container.innerHTML = `<div style="text-align: center; color: #fca5a5; padding: 30px;">❌ Network error connecting to backend API.</div>`;
+            }
+        }
+
+        function renderRequestsTable() {
+            const container = document.getElementById("tableContainer");
+            const search = (document.getElementById("searchInput").value || '').trim().toLowerCase();
+            const statusFilter = (document.getElementById("statusFilter").value || '').toLowerCase();
+
+            const filtered = myRequests.filter(req => {
+                const rNum = (req.studentRegisterNumber || req.studentId || '').toLowerCase();
+                const rName = (req.studentName || '').toLowerCase();
+                const matchSearch = rNum.includes(search) || rName.includes(search);
+
+                let reqStatus = (req.status || 'pending').toLowerCase();
+                if (req.isCompleted || req.completedStudentId) {
+                    reqStatus = 'completed';
+                }
+
+                let matchStatus = true;
+                if (statusFilter) {
+                    if (statusFilter === 'completed') {
+                        matchStatus = (req.isCompleted || req.completedStudentId);
+                    } else if (statusFilter === 'approved') {
+                        matchStatus = (req.status === 'approved' && !req.isCompleted && !req.completedStudentId);
+                    } else {
+                        matchStatus = (req.status === statusFilter);
+                    }
+                }
+
+                return matchSearch && matchStatus;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Student Registration Requests Found</h3>
+                        <p>You have not submitted any registration requests matching the filter criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table class="requests-table">
+                    <thead>
+                        <tr>
+                            <th>Register Number</th>
+                            <th>Student Name</th>
+                            <th>Class</th>
+                            <th>Request Date</th>
+                            <th>Approval Status</th>
+                            <th style="text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            filtered.forEach(req => {
+                const regNo = req.studentRegisterNumber || req.studentId || '-';
+                const name = req.studentName || '-';
+                const classCode = req.classId || (
+                    (req.department && req.department.toLowerCase().includes('computer') ? 'CS' : 'Class') + (req.year || req.academicYear || '')
+                );
+                const reqDate = req.createdAt ? new Date(req.createdAt).toLocaleDateString() : '-';
+                const isCompleted = req.isCompleted || req.completedStudentId;
+                const status = (req.status || 'pending').toLowerCase();
+
+                let statusBadge = '';
+                let actionHtml = '';
+
+                if (isCompleted) {
+                    statusBadge = `<span class="status-badge status-completed">Completed</span>`;
+                    actionHtml = `<span style="color: #38bdf8; font-size: 13px; font-weight: 600;">Registered ✓</span>`;
+                } else if (status === 'approved') {
+                    statusBadge = `<span class="status-badge status-approved">Approved</span>`;
+                    actionHtml = `
+                        <button class="btn-complete" onclick="openCompleteModal('${req._id}')">
+                            Complete Registration
+                        </button>
+                    `;
+                } else if (status === 'rejected') {
+                    statusBadge = `<span class="status-badge status-rejected">Rejected</span>`;
+                    const reason = req.rejectionReason || req.adminRemarks || 'No reason provided';
+                    actionHtml = `<div class="rejection-box" title="Admin rejection reason">Reason: ${reason}</div>`;
+                } else {
+                    // Pending
+                    statusBadge = `<span class="status-badge status-pending">Pending</span>`;
+                    actionHtml = `<span style="color: #fbbf24; font-size: 12px;">Awaiting Admin Review</span>`;
+                }
+
+                html += `
+                    <tr>
+                        <td><strong>${regNo}</strong></td>
+                        <td>${name}</td>
+                        <td>${classCode}</td>
+                        <td>${reqDate}</td>
+                        <td>${statusBadge}</td>
+                        <td style="text-align: center;">${actionHtml}</td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        function openCompleteModal(requestId) {
+            const req = myRequests.find(r => r._id === requestId);
+            if (!req) return;
+
+            activeRequest = req;
+            document.getElementById("modalRequestId").value = req._id;
+            document.getElementById("modalStudentId").value = req.studentRegisterNumber || req.studentId;
+            document.getElementById("modalStudentName").value = req.studentName;
+            document.getElementById("modalDepartment").value = req.department;
+            document.getElementById("modalYear").value = `Year ${req.year || req.academicYear}`;
+            document.getElementById("modalSection").value = req.section || '';
+            document.getElementById("modalPhone").value = req.phone || '';
+            document.getElementById("modalParentPhone").value = req.parentPhone || '';
+
+            document.getElementById("completeModal").classList.add("active");
+        }
+
+        function closeCompleteModal() {
+            document.getElementById("completeModal").classList.remove("active");
+            activeRequest = null;
+        }
+
+        async function submitCompleteRegistration(e) {
+            e.preventDefault();
+            if (!activeRequest) return;
+
+            const btn = document.getElementById("btnConfirmRegister");
+            btn.disabled = true;
+            btn.textContent = "Registering...";
+
+            const payload = {
+                studentName: document.getElementById("modalStudentName").value.trim(),
+                section: document.getElementById("modalSection").value.trim(),
+                phone: document.getElementById("modalPhone").value.trim(),
+                parentPhone: document.getElementById("modalParentPhone").value.trim()
+            };
+
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${BASE_URL}/student-requests/${activeRequest._id}/complete-registration`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                btn.disabled = false;
+                btn.textContent = "Confirm & Register Student";
+
+                if (res.ok && data.success) {
+                    alert(`✅ Student '${data.student.studentName}' (${data.student.studentId}) registered successfully in ${data.student.department} Year ${data.student.year}!`);
+
+                    // Sync into local students roster for offline/instant attendance marking
+                    try {
+                        let localStudents = JSON.parse(localStorage.getItem("students")) || [];
+                        const regId = String(data.student.studentId).toUpperCase();
+                        const exists = localStudents.some(s => String(s.studentId || s.id).toUpperCase() === regId);
+                        if (!exists) {
+                            localStudents.push({
+                                serial: data.student.serial || (localStudents.length + 1),
+                                id: regId,
+                                studentId: regId,
+                                name: data.student.studentName,
+                                studentName: data.student.studentName,
+                                department: data.student.department,
+                                year: String(data.student.year),
+                                section: data.student.section || '',
+                                phone: data.student.phone || '',
+                                parentPhone: data.student.parentPhone || ''
+                            });
+                            localStorage.setItem("students", JSON.stringify(localStudents));
+                        }
+                    } catch (e) {}
+
+                    closeCompleteModal();
+                    loadMyRequests(); // Refresh table
+                } else {
+                    alert(`❌ Registration failed: ${data.message || 'Unknown error'}`);
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.textContent = "Confirm & Register Student";
+                console.error("Complete registration error:", err);
+                alert("❌ Network error connecting to backend API. Please try again.");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadMyRequests();
+            document.getElementById("searchInput").addEventListener("input", renderRequestsTable);
+            document.getElementById("statusFilter").addEventListener("change", renderRequestsTable);
+        });
+    </script>
+</body>
+
+</html>

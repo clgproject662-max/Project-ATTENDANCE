@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Excel Upload Template - Student Details</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1, h2, h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            margin-top: 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        th {
+            background: rgba(0, 0, 0, 0.3);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .required {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        .optional {
+            color: #51cf66;
+            font-size: 12px;
+        }
+        .column-note {
+            background: rgba(23, 162, 184, 0.3);
+            border-left: 4px solid #17a2b8;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .instructions {
+            line-height: 1.8;
+            font-size: 14px;
+        }
+        .example-row {
+            background: rgba(40, 167, 69, 0.2);
+            border-left: 4px solid #28a745;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        .download-btn {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 10px 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .download-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .download-btn.secondary {
+            background: #6c757d;
+        }
+        .download-btn.secondary:hover {
+            background: #5a6268;
+        }
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            color: #856404;
+        }
+        .success {
+            background: rgba(40, 167, 69, 0.2);
+            border-left: 4px solid #28a745;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            color: #155724;
+        }
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📝 Excel Upload Template - Student Details</h1>
+
+        <div class="section">
+            <h2>📋 Required Columns (Minimally)</h2>
+            <p>Your Excel file must include at least these columns:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column Name</th>
+                        <th>Data Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>S.No</code> or <code>Serial Number</code></td>
+                        <td>Number</td>
+                        <td>Optional</td>
+                        <td>Serial number (auto-generated if not provided)</td>
+                    </tr>
+                    <tr>
+                        <td><code>Reg Number</code> or <code>Student ID</code></td>
+                        <td>Text</td>
+                        <td class="required">Required</td>
+                        <td>Student register number / ID (unique)</td>
+                    </tr>
+                    <tr>
+                        <td><code>Name</code> or <code>Student Name</code></td>
+                        <td>Text</td>
+                        <td class="required">Required</td>
+                        <td>Full name of the student</td>
+                    </tr>
+                    <tr>
+                        <td>Department (from dropdown)</td>
+                        <td>Select</td>
+                        <td>Required</td>
+                        <td>Selected in upload form</td>
+                    </tr>
+                    <tr>
+                        <td>Year (from dropdown)</td>
+                        <td>Select</td>
+                        <td>Required</td>
+                        <td>Selected in upload form</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>🎨 Optional Columns (Enhanced Details)</h2>
+            <p>Add these columns for complete student profiles with photos:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column Name</th>
+                        <th>Data Type</th>
+                        <th>Example</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>Email</code></td>
+                        <td>Text</td>
+                        <td>student@college.edu</td>
+                        <td>Student email address</td>
+                    </tr>
+                    <tr>
+                        <td><code>Phone</code></td>
+                        <td>Text</td>
+                        <td>9876543210</td>
+                        <td>Student phone number</td>
+                    </tr>
+                    <tr>
+                        <td><code>Date of Birth</code> or <code>DOB</code></td>
+                        <td>Text/Date</td>
+                        <td>2003-05-15 or 15/05/2003</td>
+                        <td>Student's date of birth</td>
+                    </tr>
+                    <tr>
+                        <td><code>Address</code></td>
+                        <td>Text</td>
+                        <td>123 Gandhi Street, Chennai</td>
+                        <td>Student's residential address</td>
+                    </tr>
+                    <tr>
+                        <td><code>Parent Name</code></td>
+                        <td>Text</td>
+                        <td>Rajesh Kumar</td>
+                        <td>Parent/Guardian name</td>
+                    </tr>
+                    <tr>
+                        <td><code>Parent Phone</code></td>
+                        <td>Text</td>
+                        <td>9876543211</td>
+                        <td>Parent/Guardian phone number</td>
+                    </tr>
+                    <tr>
+                        <td><code>Photo</code> or <code>Photo URL</code></td>
+                        <td>Text</td>
+                        <td>https://example.com/photo.jpg</td>
+                        <td>Public photo URL or base64</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>📖 Excel Column Names Supported</h2>
+            <p>The system accepts various column name formats (case-insensitive):</p>
+            
+            <div class="column-note">
+                <strong>ID/Reg No:</strong> reg number, Reg Number, REG NUMBER, regno, RegNo, Reg No, reg no, register no, Register No, studentId, StudentId, id, ID
+            </div>
+            
+            <div class="column-note">
+                <strong>Name:</strong> name, Name, NAME, studentName, StudentName, student name, Student, student, bname, Bname, BNAME
+            </div>
+            
+            <div class="column-note">
+                <strong>Email:</strong> email, Email, EMAIL
+            </div>
+            
+            <div class="column-note">
+                <strong>Phone:</strong> phone, Phone, PHONE
+            </div>
+            
+            <div class="column-note">
+                <strong>Date of Birth:</strong> date of birth, Date of Birth, dob, Dob, DOB
+            </div>
+            
+            <div class="column-note">
+                <strong>Address:</strong> address, Address, ADDRESS
+            </div>
+            
+            <div class="column-note">
+                <strong>Parent Name:</strong> parent name, Parent Name, father name, Father Name, mother name, Mother name, guardian name
+            </div>
+            
+            <div class="column-note">
+                <strong>Parent Phone:</strong> parent phone, Parent Phone, guardian phone
+            </div>
+            
+            <div class="column-note">
+                <strong>Photo:</strong> photo, Photo, PHOTO, photo_url, Photo URL
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📄 Sample Excel Data</h2>
+            <p>Here's how your Excel file should look:</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Reg Number</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Date of Birth</th>
+                        <th>Address</th>
+                        <th>Parent Name</th>
+                        <th>Parent Phone</th>
+                        <th>Photo URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>CS2021001</td>
+                        <td>Rajesh Kumar</td>
+                        <td>rajesh.kumar@college.edu</td>
+                        <td>9876543210</td>
+                        <td>2003-05-15</td>
+                        <td>123 Gandhi Street, Chennai, Tamil Nadu</td>
+                        <td>Kumar Rajan</td>
+                        <td>9876543211</td>
+                        <td>https://randomuser.me/api/portraits/men/1.jpg</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>CS2021002</td>
+                        <td>Priya Sharma</td>
+                        <td>priya.sharma@college.edu</td>
+                        <td>9876543212</td>
+                        <td>2003-08-22</td>
+                        <td>456 Anna Nagar, Chennai, Tamil Nadu</td>
+                        <td>Sharma Ravi</td>
+                        <td>9876543213</td>
+                        <td>https://randomuser.me/api/portraits/women/2.jpg</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>CS2021003</td>
+                        <td>Arjun Patel</td>
+                        <td>arjun.patel@college.edu</td>
+                        <td>9876543214</td>
+                        <td>2004-03-10</td>
+                        <td>789 Nehru Road, Chennai, Tamil Nadu</td>
+                        <td>Patel Vijay</td>
+                        <td>9876543215</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>IT2021001</td>
+                        <td>Sneha Reddy</td>
+                        <td>sneha.reddy@college.edu</td>
+                        <td>9876543216</td>
+                        <td>2003-11-05</td>
+                        <td>321 Mount Road, Chennai, Tamil Nadu</td>
+                        <td>Reddy Mohan</td>
+                        <td>9876543217</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="example-row">
+                <strong>💡 Tip:</strong> For photo URLs, you can use services like:<br>
+                • <code>https://randomuser.me/api/portraits/men/{number}.jpg</code><br>
+                • <code>https://randomuser.me/api/portraits/women/{number}.jpg</code><br>
+                • <code>https://ui-avatars.com/api/?name=Rajesh+Kumar&size=200</code>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🚀 How to Upload</h2>
+            
+            <div class="instructions">
+                <h3>Step-by-Step Process:</h3>
+                <ol>
+                    <li><strong>Download the Template</strong> (optional but recommended)</li>
+                    <li><strong>Fill in the Excel Data</strong>
+                        <ul>
+                            <li>Enter all required columns (S.No, Reg Number, Name)</li>
+                            <li>Add optional columns (Email, Phone, Photo, etc.) as needed</li>
+                            <li>Save your Excel file</li>
+                        </ul>
+                    </li>
+                    <li><strong>Go to Admin Panel</strong> → Students Data</li>
+                    <li><strong>Click "Upload Excel"</strong> button</li>
+                    <li><strong>Select Your Department and Year</strong> from dropdowns</li>
+                    <li><strong>Choose Your Excel File</strong> and click "Upload"</li>
+                    <li><strong>Review the Preview</strong> and confirm</li>
+                </ol>
+            </div>
+
+            <div class="warning">
+                <strong>⚠️ Important Notes:</strong>
+                <ul>
+                    <li>Department and Year are selected in the upload form (not in Excel)</li>
+                    <li>Reg Number must be unique within the same department and year</li>
+                    <li>Photo URLs must be publicly accessible (not local files)</li>
+                    <li>Existing students in the same department/year will be updated</li>
+                </ul>
+            </div>
+
+            <div class="success">
+                <strong>✅ After Upload:</strong>
+                <ul>
+                    <li>Students appear in Students Data page</li>
+                    <li>Photos display as circular thumbnails</li>
+                    <li>Click "View Details" to see full profile</li>
+                    <li>All data searchable and filterable</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📥 Download Resources</h2>
+            <p><strong>Template Download:</strong></p>
+            <p style="text-align: center;">
+                <a href="#" onclick="alert('Template is available as a guide above. Create your Excel with the column names shown.')" class="download-btn">📋 Download Template (PDF)</a>
+            </p>
+            <p style="text-align: center; margin-top: 10px;">
+                <span style="font-size: 12px; color: rgba(255, 255, 255, 0.7);">
+                    Note: Use the column names shown in the sample table above when creating your Excel file.
+                </span>
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>🔄 Quick Navigation</h2>
+            <p style="text-align: center;">
+                <a href="excelupload.html" class="download-btn">📤 Upload Excel File</a>
+                <a href="studentsdata.html" class="download-btn secondary">📊 View Students Data</a>
+                <a href="javascript:void(0)" onclick="goBack()" class="download-btn secondary">🏠 Back to Dashboard</a>
+            </p>
+        </div>
+
+        <script>
+            function goBack() {
+                let user = null;
+                try {
+                    user = JSON.parse(localStorage.getItem("currentUser"));
+                } catch (e) {}
+                if (user && user.role === "admin") {
+                    window.location.href = "admin.html";
+                } else {
+                    window.location.href = "home.html";
+                }
+            }
+        </script>
+
+        <div class="section">
+            <h2>❓ Common Issues</h2>
+            
+            <div class="warning">
+                <strong>Q: Why isn't my photo showing?</strong><br>
+                <strong>A:</strong> The photo URL must be publicly accessible. Make sure the link doesn't require login or has CORS restrictions.
+            </div>
+            
+            <div class="warning">
+                <strong>Q: How do I add photos for existing students?</strong><br>
+                <strong>A:</strong> You can update them individually by going to Students Data, clicking "View Details", and using the edit functionality (if available), or re-upload with photo URLs.
+            </div>
+            
+            <div class="warning">
+                <strong>Q: Can I use base64 images for photos?</strong><br>
+                <strong>A:</strong> Yes! Format: <code>data:image/jpeg;base64,/9j/4AAQSkZJRg...</code>
+            </div>
+            
+            <div class="warning">
+                <strong>Q: What happens if I upload duplicate Reg Numbers?</strong><br>
+                <strong>A:</strong> The system updates existing records instead of creating duplicates. The serial number is preserved if already set.
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

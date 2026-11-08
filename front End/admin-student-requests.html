@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration Requests - Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-requests-container {
+            max-width: 1450px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 26px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .summary-card .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .summary-card .label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.85);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .summary-card.total { border-left: 4px solid #3b82f6; }
+        .summary-card.pending { border-left: 4px solid #f59e0b; }
+        .summary-card.approved { border-left: 4px solid #10b981; }
+        .summary-card.rejected { border-left: 4px solid #ef4444; }
+
+        .toolbar {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .toolbar-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 9px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filters select {
+            padding: 8px 14px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            font-size: 13px;
+        }
+
+        .filters select option {
+            background: #1e293b;
+            color: white;
+        }
+
+        .btn-refresh {
+            padding: 8px 18px;
+            border-radius: 18px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .btn-refresh:hover {
+            background: #1d4ed8;
+        }
+
+        .requests-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        .requests-table th {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+        }
+
+        .requests-table td {
+            padding: 11px 10px;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            vertical-align: middle;
+        }
+
+        .requests-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: capitalize;
+            white-space: nowrap;
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.25);
+            color: #fbbf24;
+            border: 1px solid #f59e0b;
+        }
+
+        .status-approved {
+            background: rgba(16, 185, 129, 0.25);
+            color: #34d399;
+            border: 1px solid #10b981;
+        }
+
+        .status-rejected {
+            background: rgba(239, 68, 68, 0.25);
+            color: #f87171;
+            border: 1px solid #ef4444;
+        }
+
+        .status-completed {
+            background: rgba(56, 189, 248, 0.25);
+            color: #38bdf8;
+            border: 1px solid #0284c7;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .btn-action {
+            padding: 5px 11px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-view {
+            background: #475569;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #334155;
+        }
+
+        .btn-approve {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #059669;
+        }
+
+        .btn-reject {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #dc2626;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            overflow-y: auto;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 580px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            color: white;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 10px;
+        }
+
+        .modal-header h2 {
+            color: #38bdf8;
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .detail-row {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 8px;
+        }
+
+        .detail-row label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 3px;
+            color: #fbbf24;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .detail-row .value {
+            font-size: 15px;
+            color: white;
+            word-break: break-all;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 14px;
+        }
+
+        .modal-footer button {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        @media (max-width: 900px) {
+            .requests-table {
+                font-size: 11px;
+            }
+            .requests-table th, .requests-table td {
+                padding: 6px 4px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <img src="logo.png" alt="Logo" class="logo" onerror="this.src='logo.png'">
+        <h2 class="center" style="padding-left: 35%;">College Attendance System</h2>
+    </header>
+
+    <div class="admin-requests-container">
+        <h1 class="page-title">Admin Dashboard – Student Registration Requests</h1>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card total">
+                <div class="number" id="totalCount">0</div>
+                <div class="label">Total Requests</div>
+            </div>
+            <div class="summary-card pending">
+                <div class="number" id="pendingCount">0</div>
+                <div class="label">Pending Requests</div>
+            </div>
+            <div class="summary-card approved">
+                <div class="number" id="approvedCount">0</div>
+                <div class="label">Approved Requests</div>
+            </div>
+            <div class="summary-card rejected">
+                <div class="number" id="rejectedCount">0</div>
+                <div class="label">Rejected Requests</div>
+            </div>
+        </div>
+
+        <!-- Toolbar and Filters -->
+        <div class="toolbar">
+            <div class="toolbar-row">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search by Student Name, Register Number, or Staff Name...">
+                </div>
+                <div class="filters">
+                    <!-- Status Filter: Pending, Approved, Rejected -->
+                    <select id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="pending">Pending requests</option>
+                        <option value="approved">Approved requests</option>
+                        <option value="rejected">Rejected requests</option>
+                    </select>
+
+                    <!-- Department Filter -->
+                    <select id="departmentFilter">
+                        <option value="">All Departments</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Tamil">Tamil</option>
+                        <option value="English">English</option>
+                    </select>
+
+                    <!-- Academic Year Filter -->
+                    <select id="yearFilter">
+                        <option value="">All Academic Years</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                    </select>
+
+                    <!-- Class Filter -->
+                    <select id="classFilter">
+                        <option value="">All Classes</option>
+                        <option value="CS1">CS1</option>
+                        <option value="CS2">CS2</option>
+                        <option value="CS3">CS3</option>
+                    </select>
+
+                    <button class="btn-refresh" onclick="loadRequests()">🔄 Refresh</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Requests Table -->
+        <div id="tableContainer">
+            <div style="text-align: center; color: white; padding: 40px;">Loading student registration requests...</div>
+        </div>
+
+        <!-- Back Button -->
+        <div style="text-align: center; margin-top: 30px;">
+            <button onclick="window.location.href='admin.html'" style="padding: 10px 28px; background: transparent; color: white; border: 2px solid white; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: bold;">
+                Back to Admin Dashboard
+            </button>
+        </div>
+    </div>
+
+    <!-- View Details Modal -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Student Request Details</h2>
+                <button class="modal-close" onclick="closeModal('viewModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter">
+                <button onclick="closeModal('viewModal')" style="background: #64748b; color: white;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div id="rejectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: #f87171;">Reject Student Registration Request</h2>
+                <button class="modal-close" onclick="closeModal('rejectModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 12px; color: #cbd5e1;">Please enter the reason for rejecting this student registration request (this will be displayed to the Staff member):</p>
+                <textarea id="rejectReason" style="width: 100%; min-height: 90px; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; box-sizing: border-box;" placeholder="Enter rejection reason..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('rejectModal')" style="background: #64748b; color: white;">Cancel</button>
+                <button onclick="confirmReject()" id="btnConfirmReject" style="background: #ef4444; color: white;">Confirm Rejection</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let allRequests = [];
+        let filteredRequests = [];
+        let currentRejectId = null;
+
+        function checkAuth() {
+            const user = getCurrentUser();
+            if (!user) {
+                alert("Please log in first.");
+                window.location.href = "index.html";
+                return false;
+            }
+            if (user.role !== "admin") {
+                alert("Access denied. Admin privileges required.");
+                window.location.href = "home.html";
+                return false;
+            }
+            return true;
+        }
+
+        async function loadRequests() {
+            if (!checkAuth()) return;
+
+            const container = document.getElementById("tableContainer");
+            container.innerHTML = '<div style="text-align: center; color: white; padding: 40px;">Fetching requests...</div>';
+
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${BASE_URL}/student-requests/all`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    allRequests = data.requests || [];
+                    updateSummary(data.summary || {});
+                    applyFilters();
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    container.innerHTML = `<div style="text-align: center; color: #fca5a5; padding: 30px;">❌ ${err.message || 'Failed to load requests'}</div>`;
+                }
+            } catch (error) {
+                console.error("Error loading requests:", error);
+                container.innerHTML = '<div style="text-align: center; color: #fca5a5; padding: 30px;">❌ Network error connecting to backend API.</div>';
+            }
+        }
+
+        function updateSummary(summary) {
+            document.getElementById("totalCount").textContent = summary.total !== undefined ? summary.total : allRequests.length;
+            document.getElementById("pendingCount").textContent = summary.pending !== undefined ? summary.pending : allRequests.filter(r => r.status === 'pending').length;
+            document.getElementById("approvedCount").textContent = summary.approved !== undefined ? summary.approved : allRequests.filter(r => r.status === 'approved').length;
+            document.getElementById("rejectedCount").textContent = summary.rejected !== undefined ? summary.rejected : allRequests.filter(r => r.status === 'rejected').length;
+        }
+
+        function applyFilters() {
+            const searchTerm = (document.getElementById("searchInput").value || '').toLowerCase();
+            const statusFilter = (document.getElementById("statusFilter").value || '').toLowerCase();
+            const departmentFilter = (document.getElementById("departmentFilter").value || '').toLowerCase();
+            const yearFilter = (document.getElementById("yearFilter").value || '');
+            const classFilter = (document.getElementById("classFilter").value || '').toUpperCase();
+
+            filteredRequests = allRequests.filter(request => {
+                const sName = (request.studentName || '').toLowerCase();
+                const sReg = (request.studentRegisterNumber || request.studentId || '').toLowerCase();
+                const staffName = (request.requestedByName || '').toLowerCase();
+                const staffUser = (request.requestedBy || '').toLowerCase();
+
+                const matchesSearch = sName.includes(searchTerm) || sReg.includes(searchTerm) || staffName.includes(searchTerm) || staffUser.includes(searchTerm);
+
+                let reqStatus = (request.status || 'pending').toLowerCase();
+                const matchesStatus = !statusFilter || (reqStatus === statusFilter);
+
+                const matchesDept = !departmentFilter || (request.department || '').toLowerCase() === departmentFilter;
+
+                const reqYear = String(request.academicYear || request.year || '');
+                const matchesYear = !yearFilter || reqYear === yearFilter;
+
+                const reqClass = String(request.classId || '').toUpperCase();
+                const matchesClass = !classFilter || reqClass.includes(classFilter);
+
+                return matchesSearch && matchesStatus && matchesDept && matchesYear && matchesClass;
+            });
+
+            displayRequests();
+        }
+
+        function displayRequests() {
+            const container = document.getElementById("tableContainer");
+
+            if (filteredRequests.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Student Registration Requests Found</h3>
+                        <p>No requests match the selected filters.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <table class="requests-table">
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Staff Name</th>
+                            <th>Staff Username/ID</th>
+                            <th>Register Number</th>
+                            <th>Student Name</th>
+                            <th>Department</th>
+                            <th>Academic Year</th>
+                            <th>Requested Class</th>
+                            <th>Request Date</th>
+                            <th>Current Status</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            filteredRequests.forEach(req => {
+                const reqId = req._id ? req._id.substring(req._id.length - 8) : '-';
+                const staffName = req.requestedByName || '-';
+                const staffUser = req.requestedBy || (req.staffId ? String(req.staffId).substring(0, 8) : '-');
+                const regNo = req.studentRegisterNumber || req.studentId || '-';
+                const sName = req.studentName || '-';
+                const dept = req.department || '-';
+                const year = req.academicYear || req.year || '-';
+                const classCode = req.classId || ((dept.toLowerCase().includes('computer') ? 'CS' : dept.substring(0, 3).toUpperCase()) + year);
+                const reqDate = req.createdAt ? new Date(req.createdAt).toLocaleDateString() : '-';
+                const status = (req.status || 'pending').toLowerCase();
+                const isPending = (status === 'pending');
+                const isCompleted = req.isCompleted || req.completedStudentId;
+
+                let statusBadge = '';
+                if (isCompleted) {
+                    statusBadge = `<span class="status-badge status-completed">Completed</span>`;
+                } else if (status === 'approved') {
+                    statusBadge = `<span class="status-badge status-approved">Approved</span>`;
+                } else if (status === 'rejected') {
+                    statusBadge = `<span class="status-badge status-rejected">Rejected</span>`;
+                } else {
+                    statusBadge = `<span class="status-badge status-pending">Pending</span>`;
+                }
+
+                html += `
+                    <tr>
+                        <td title="${req._id}"><code style="color: #cbd5e1;">${reqId}</code></td>
+                        <td>${staffName}</td>
+                        <td><code style="color: #fde047;">${staffUser}</code></td>
+                        <td><strong>${regNo}</strong></td>
+                        <td>${sName}</td>
+                        <td>${dept}</td>
+                        <td>Year ${year}</td>
+                        <td><span style="color: #67e8f9; font-weight: bold;">${classCode}</span></td>
+                        <td>${reqDate}</td>
+                        <td>${statusBadge}</td>
+                        <td style="text-align: center;">
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" onclick="openViewModal('${req._id}')">View Details</button>
+                                ${isPending ? `
+                                    <button class="btn-action btn-approve" onclick="approveRequest('${req._id}')">Approve</button>
+                                    <button class="btn-action btn-reject" onclick="openRejectModal('${req._id}')">Reject</button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        function openViewModal(requestId) {
+            const req = allRequests.find(r => r._id === requestId);
+            if (!req) return;
+
+            const modal = document.getElementById("viewModal");
+            const body = document.getElementById("modalBody");
+            const footer = document.getElementById("modalFooter");
+            const isPending = (req.status === 'pending');
+
+            const reqDate = req.createdAt ? new Date(req.createdAt).toLocaleString() : '-';
+            const reviewedDate = req.reviewedAt || req.approvedAt || req.rejectedAt;
+            const reviewedDateStr = reviewedDate ? new Date(reviewedDate).toLocaleString() : null;
+
+            body.innerHTML = `
+                <div class="detail-row">
+                    <label>Request ID:</label>
+                    <div class="value"><code>${req._id}</code></div>
+                </div>
+                <div class="detail-row">
+                    <label>Staff Member:</label>
+                    <div class="value">${req.requestedByName} (Username/ID: ${req.requestedBy || req.staffId})</div>
+                </div>
+                <div class="detail-row">
+                    <label>Student Register Number / Roll Number:</label>
+                    <div class="value" style="color: #67e8f9; font-weight: bold;">${req.studentRegisterNumber || req.studentId}</div>
+                </div>
+                <div class="detail-row">
+                    <label>Student Name:</label>
+                    <div class="value" style="font-weight: bold;">${req.studentName}</div>
+                </div>
+                <div class="detail-row">
+                    <label>Department & Academic Year:</label>
+                    <div class="value">${req.department} - Year ${req.academicYear || req.year} (Class: ${req.classId || 'N/A'})</div>
+                </div>
+                ${req.section ? `
+                <div class="detail-row">
+                    <label>Section:</label>
+                    <div class="value">${req.section}</div>
+                </div>` : ''}
+                ${req.phone ? `
+                <div class="detail-row">
+                    <label>Student Phone:</label>
+                    <div class="value">${req.phone}</div>
+                </div>` : ''}
+                ${req.parentPhone ? `
+                <div class="detail-row">
+                    <label>Parent Phone:</label>
+                    <div class="value">${req.parentPhone}</div>
+                </div>` : ''}
+                ${req.reason ? `
+                <div class="detail-row">
+                    <label>Staff Notes / Reason:</label>
+                    <div class="value">${req.reason}</div>
+                </div>` : ''}
+                <div class="detail-row">
+                    <label>Request Submitted At:</label>
+                    <div class="value">${reqDate}</div>
+                </div>
+                <div class="detail-row">
+                    <label>Current Status:</label>
+                    <div class="value"><span class="status-badge status-${req.status}">${req.status.toUpperCase()}</span> ${req.isCompleted ? '(Student Registered by Staff)' : ''}</div>
+                </div>
+                ${(req.rejectionReason || req.adminRemarks) ? `
+                <div class="detail-row">
+                    <label>${req.status === 'rejected' ? 'Rejection Reason' : 'Admin Remarks'}:</label>
+                    <div class="value" style="color: ${req.status === 'rejected' ? '#fca5a5' : '#86efac'};">${req.rejectionReason || req.adminRemarks}</div>
+                </div>` : ''}
+                ${reviewedDateStr ? `
+                <div class="detail-row">
+                    <label>Reviewed By & At:</label>
+                    <div class="value">${req.reviewedBy || req.approvedBy || req.rejectedBy} on ${reviewedDateStr}</div>
+                </div>` : ''}
+            `;
+
+            footer.innerHTML = `
+                <button onclick="closeModal('viewModal')" style="background: #64748b; color: white;">Close</button>
+                ${isPending ? `
+                    <button onclick="closeModal('viewModal'); approveRequest('${req._id}');" style="background: #10b981; color: white;">Approve Request</button>
+                    <button onclick="closeModal('viewModal'); openRejectModal('${req._id}');" style="background: #ef4444; color: white;">Reject Request</button>
+                ` : ''}
+            `;
+
+            modal.classList.add('active');
+        }
+
+        async function approveRequest(requestId) {
+            const req = allRequests.find(r => r._id === requestId);
+            const studentInfo = req ? `'${req.studentName}' (${req.studentRegisterNumber || req.studentId})` : 'this request';
+
+            if (!confirm(`Are you sure you want to APPROVE registration request for ${studentInfo}?\n\nThis will grant permission to Staff to complete the registration.`)) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${BASE_URL}/student-requests/${requestId}/approve`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ remarks: 'Approved by Administrator.' })
+                });
+
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert(`✅ Request Approved Successfully!\n\nPermission has been granted to the assigned Staff member to complete registration.`);
+                    loadRequests(); // Refresh table and stats
+                } else {
+                    alert(`❌ Failed to approve: ${data.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error("Approve error:", error);
+                alert("❌ Network error connecting to backend API. Please try again.");
+            }
+        }
+
+        function openRejectModal(requestId) {
+            currentRejectId = requestId;
+            document.getElementById("rejectReason").value = '';
+            document.getElementById("rejectModal").classList.add('active');
+        }
+
+        async function confirmReject() {
+            const reason = document.getElementById("rejectReason").value.trim();
+            if (!reason) {
+                alert("Please enter a reason for rejecting this student registration request.");
+                return;
+            }
+
+            const btn = document.getElementById("btnConfirmReject");
+            btn.disabled = true;
+            btn.textContent = "Rejecting...";
+
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${BASE_URL}/student-requests/${currentRejectId}/reject`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ reason })
+                });
+
+                const data = await res.json();
+                btn.disabled = false;
+                btn.textContent = "Confirm Rejection";
+
+                if (res.ok && data.success) {
+                    alert(`✅ Request Rejected. The rejection status and reason have been recorded.`);
+                    closeModal('rejectModal');
+                    loadRequests(); // Refresh table and stats
+                } else {
+                    alert(`❌ Failed to reject request: ${data.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                btn.disabled = false;
+                btn.textContent = "Confirm Rejection";
+                console.error("Reject error:", error);
+                alert("❌ Network error connecting to backend API. Please try again.");
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.classList.remove('active');
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadRequests();
+
+            document.getElementById("searchInput").addEventListener("input", applyFilters);
+            document.getElementById("statusFilter").addEventListener("change", applyFilters);
+            document.getElementById("departmentFilter").addEventListener("change", applyFilters);
+            document.getElementById("yearFilter").addEventListener("change", applyFilters);
+            document.getElementById("classFilter").addEventListener("change", applyFilters);
+
+            window.addEventListener("click", function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

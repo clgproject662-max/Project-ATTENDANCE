@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>College Attendance System - Full System Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 { color: #333; margin-bottom: 30px; text-align: center; }
+        h2 { color: #667eea; margin: 25px 0 15px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        .test-section { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+        .result { margin: 10px 0; padding: 12px; border-radius: 5px; border-left: 4px solid #ddd; }
+        .pass { background: #d4edda; color: #155724; border-left-color: #28a745; }
+        .fail { background: #f8d7da; color: #721c24; border-left-color: #dc3545; }
+        .warn { background: #fff3cd; color: #856404; border-left-color: #ffc107; }
+        .info { background: #d1ecf1; color: #0c5460; border-left-color: #17a2b8; }
+        .btn { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-warning:hover { background: #e0a800; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 10px; text-align: left; border: 1px solid #ddd; }
+        th { background: #667eea; color: white; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        .badge { 
+            display: inline-block; 
+            padding: 3px 8px; 
+            border-radius: 3px; 
+            font-size: 12px; 
+            font-weight: bold;
+        }
+        .badge-success { background: #28a745; color: white; }
+        .badge-danger { background: #dc3545; color: white; }
+        .badge-warning { background: #ffc107; color: black; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>College Attendance System </h1>
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <button class="btn btn-primary" onclick="runAllTests()">🔍 Run All Tests</button>
+            <button class="btn btn-success" onclick="initializeSystem()">🚀 Initialize System</button>
+            <button class="btn btn-warning" onclick="clearAllData()">🗑️ Clear All Data</button>
+            <button class="btn btn-danger" onclick="location.reload()">🔄 Reload Page</button>
+        </div>
+
+        <h2>📋 Test Results</h2>
+        <div id="testResults"></div>
+
+        <h2>🔗 System Pages</h2>
+        <div id="pageLinks"></div>
+
+        <h2>👥 Test Users</h2>
+        <div id="userInfo"></div>
+
+        <h2>📊 Current Data</h2>
+        <div id="dataInfo"></div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const pages = [
+            { name: 'Login Page', file: 'index.html', access: 'Public' },
+            { name: 'Admin Panel', file: 'admin.html', access: 'Admin Only' },
+            { name: 'Staff Dashboard', file: 'home.html', access: 'Staff Only' },
+            { name: 'Take Attendance', file: 'attendance.html', access: 'Staff Only' },
+            { name: 'Daily Report', file: 'dailyreport.html', access: 'Admin Only' },
+            { name: 'Detailed Report', file: 'report.html', access: 'Staff & Admin' },
+            { name: 'Register Student', file: 'register.html', access: 'Admin Only' },
+            { name: 'Excel Upload', file: 'excelupload.html', access: 'Admin Only' },
+            { name: 'Students Data', file: 'studentsdata.html', access: 'Admin Only' },
+            { name: 'Delete Data', file: 'deletedata.html', access: 'Admin Only' }
+        ];
+
+        const testUsers = [
+            { username: 'admin', password: 'admin123', role: 'admin', name: 'Administrator' },
+            { username: 'cs1', password: 'cs123', role: 'staff', name: 'CS Staff Year 1', dept: 'Computer Science', year: '1' },
+            { username: 'cs2', password: 'cs123', role: 'staff', name: 'CS Staff Year 2', dept: 'Computer Science', year: '2' },
+            { username: 'cs3', password: 'cs123', role: 'staff', name: 'CS Staff Year 3', dept: 'Computer Science', year: '3' }
+        ];
+
+        function runAllTests() {
+            const results = [];
+            
+            // Test 1: localStorage availability
+            results.push(testLocalStorage());
+            
+            // Test 2: Check required files
+            results.push(testRequiredFiles());
+            
+            // Test 3: Check data structures
+            results.push(testDataStructures());
+            
+            // Test 4: Check authentication
+            results.push(testAuthentication());
+            
+            // Test 5: Check XLSX library
+            results.push(testXLSXLibrary());
+            
+            displayResults(results);
+            displayPageLinks();
+            displayUserInfo();
+            displayDataInfo();
+        }
+
+        function testLocalStorage() {
+            try {
+                localStorage.setItem('test', 'value');
+                const value = localStorage.getItem('test');
+                localStorage.removeItem('test');
+                return { 
+                    type: 'pass', 
+                    category: 'System',
+                    message: '✅ localStorage is working properly' 
+                };
+            } catch (e) {
+                return { 
+                    type: 'fail', 
+                    category: 'System',
+                    message: '❌ localStorage not available: ' + e.message 
+                };
+            }
+        }
+
+        function testRequiredFiles() {
+            const requiredFiles = ['script.js', 'style.css'];
+            const missing = [];
+            
+            // Check if script.js functions are available
+            if (typeof getCurrentUser !== 'function') {
+                missing.push('script.js (functions not loaded)');
+            }
+            
+            if (missing.length > 0) {
+                return {
+                    type: 'fail',
+                    category: 'Files',
+                    message: '❌ Missing files: ' + missing.join(', ')
+                };
+            }
+            return {
+                type: 'pass',
+                category: 'Files',
+                message: '✅ All required files are loaded'
+            };
+        }
+
+        function testDataStructures() {
+            try {
+                const students = JSON.parse(localStorage.getItem('students')) || [];
+                const ledger = JSON.parse(localStorage.getItem('all_attendance_ledger')) || [];
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                
+                return {
+                    type: 'info',
+                    category: 'Data',
+                    message: `📊 Data Status: ${students.length} students, ${ledger.length} attendance records, User: ${currentUser ? currentUser.username : 'Not logged in'}`
+                };
+            } catch (e) {
+                return {
+                    type: 'fail',
+                    category: 'Data',
+                    message: '❌ Error reading data structures: ' + e.message
+                };
+            }
+        }
+
+        function testAuthentication() {
+            try {
+                const currentUser = getCurrentUser();
+                if (currentUser) {
+                    return {
+                        type: 'pass',
+                        category: 'Auth',
+                        message: `✅ Logged in as: ${currentUser.name || currentUser.username} (${currentUser.role})`
+                    };
+                } else {
+                    return {
+                        type: 'warn',
+                        category: 'Auth',
+                        message: '⚠️ No user logged in. Please login to test full functionality.'
+                    };
+                }
+            } catch (e) {
+                return {
+                    type: 'fail',
+                    category: 'Auth',
+                    message: '❌ Authentication error: ' + e.message
+                };
+            }
+        }
+
+        function testXLSXLibrary() {
+            if (typeof XLSX !== 'undefined') {
+                return {
+                    type: 'pass',
+                    category: 'Libraries',
+                    message: '✅ XLSX library loaded (Excel export available)'
+                };
+            } else {
+                return {
+                    type: 'warn',
+                    category: 'Libraries',
+                    message: '⚠️ XLSX library not loaded (Excel export will not work)'
+                };
+            }
+        }
+
+        function displayResults(results) {
+            const container = document.getElementById('testResults');
+            container.innerHTML = results.map(r => 
+                `<div class="result ${r.type}"><strong>[${r.category}]</strong> ${r.message}</div>`
+            ).join('');
+        }
+
+        function displayPageLinks() {
+            const container = document.getElementById('pageLinks');
+            let html = '<table><tr><th>Page Name</th><th>File</th><th>Access Level</th><th>Action</th></tr>';
+            
+            pages.forEach(page => {
+                html += `
+                    <tr>
+                        <td>${page.name}</td>
+                        <td><code>${page.file}</code></td>
+                        <td><span class="badge badge-${page.access.includes('Admin') ? 'danger' : page.access.includes('Staff') ? 'warning' : 'success'}">${page.access}</span></td>
+                        <td><a href="${page.file}" class="btn btn-primary" style="padding: 5px 10px; text-decoration: none;">Open</a></td>
+                    </tr>
+                `;
+            });
+            
+            html += '</table>';
+            container.innerHTML = html;
+        }
+
+        function displayUserInfo() {
+            const container = document.getElementById('userInfo');
+            let html = '<table><tr><th>Username</th><th>Password</th><th>Role</th><th>Department/Year</th><th>Action</th></tr>';
+            
+            testUsers.forEach(user => {
+                html += `
+                    <tr>
+                        <td><strong>${user.username}</strong></td>
+                        <td><code>${user.password}</code></td>
+                        <td><span class="badge badge-${user.role === 'admin' ? 'danger' : 'warning'}">${user.role}</span></td>
+                        <td>${user.dept ? `${user.dept} - Year ${user.year}` : 'All'}</td>
+                        <td><button class="btn btn-success" style="padding: 5px 10px;" onclick="quickLogin('${user.username}', '${user.password}', '${user.role}', '${user.dept || 'Administration'}', '${user.year || 'All'}', '${user.name}')">Quick Login</button></td>
+                    </tr>
+                `;
+            });
+            
+            html += '</table>';
+            container.innerHTML = html;
+        }
+
+        function displayDataInfo() {
+            try {
+                const students = JSON.parse(localStorage.getItem('students')) || [];
+                const ledger = JSON.parse(localStorage.getItem('all_attendance_ledger')) || [];
+                
+                let html = '<div class="test-section">';
+                
+                // Students by department
+                html += '<h3>Students by Department and Year:</h3>';
+                const grouped = {};
+                students.forEach(s => {
+                    const key = `${s.department} - Year ${s.year}`;
+                    grouped[key] = (grouped[key] || 0) + 1;
+                });
+                
+                if (Object.keys(grouped).length === 0) {
+                    html += '<div class="result warn">⚠️ No students in system. Click "Initialize System" to add sample students.</div>';
+                } else {
+                    html += '<ul>';
+                    Object.keys(grouped).forEach(key => {
+                        html += `<li><strong>${key}:</strong> ${grouped[key]} students</li>`;
+                    });
+                    html += '</ul>';
+                }
+                
+                // Attendance records
+                html += '<h3>Attendance Records:</h3>';
+                if (ledger.length === 0) {
+                    html += '<div class="result warn">⚠️ No attendance records. Staff should submit attendance first.</div>';
+                } else {
+                    const dates = [...new Set(ledger.map(l => l.date))].sort().reverse();
+                    html += `<div class="result info">📅 Recorded Dates: ${dates.slice(0, 5).join(', ')}${dates.length > 5 ? ` ... (${dates.length} total dates)` : ''}</div>`;
+                }
+                
+                html += '</div>';
+                document.getElementById('dataInfo').innerHTML = html;
+                
+            } catch (e) {
+                document.getElementById('dataInfo').innerHTML = 
+                    `<div class="result fail">❌ Error reading data: ${e.message}</div>`;
+            }
+        }
+
+        function quickLogin(username, password, role, dept, year, name) {
+            const userObj = {
+                id: 'local_' + username,
+                name: name,
+                username: username,
+                role: role,
+                department: dept,
+                year: year
+            };
+            
+            localStorage.setItem('token', 'local-token-' + username);
+            localStorage.setItem('currentUser', JSON.stringify(userObj));
+            localStorage.setItem('department', dept);
+            localStorage.setItem('year', year);
+            
+            alert(`✅ Logged in as ${name}!\n\nRedirecting to ${role === 'admin' ? 'Admin Panel' : 'Staff Dashboard'}...`);
+            
+            setTimeout(() => {
+                window.location.href = role === 'admin' ? 'admin.html' : 'home.html';
+            }, 1000);
+        }
+
+        function initializeSystem() {
+            if (confirm('Initialize system with sample data?\n\nThis will add:\n- 20+ sample students\n- 3 days of sample attendance\n\nExisting data will be preserved.')) {
+                // Sample students for all departments
+                const sampleStudents = [
+                    // Computer Science Year 1
+                    { serial: 1, studentId: '24CS001', studentName: 'Arun Kumar', name: 'Arun Kumar', department: 'Computer Science', year: '1' },
+                    { serial: 2, studentId: '24CS002', studentName: 'Priya Sharma', name: 'Priya Sharma', department: 'Computer Science', year: '1' },
+                    { serial: 3, studentId: '24CS003', studentName: 'Vijay Patel', name: 'Vijay Patel', department: 'Computer Science', year: '1' },
+                    
+                    // Computer Science Year 2
+                    { serial: 4, studentId: '23CS001', studentName: 'Deepak Singh', name: 'Deepak Singh', department: 'Computer Science', year: '2' },
+                    { serial: 5, studentId: '23CS002', studentName: 'Kavitha R', name: 'Kavitha R', department: 'Computer Science', year: '2' },
+                    
+                    // Computer Science Year 3
+                    { serial: 6, studentId: '22CS001', studentName: 'Aravind M', name: 'Aravind M', department: 'Computer Science', year: '3' },
+                    { serial: 7, studentId: '22CS002', studentName: 'Bhavani S', name: 'Bhavani S', department: 'Computer Science', year: '3' },
+                    { serial: 8, studentId: '22CS003', studentName: 'Chandran K', name: 'Chandran K', department: 'Computer Science', year: '3' },
+                    
+                    // Information Technology
+                    { serial: 9, studentId: '24IT001', studentName: 'Divya R', name: 'Divya R', department: 'Information Technology', year: '1' },
+                    { serial: 10, studentId: '24IT002', studentName: 'Ganesh P', name: 'Ganesh P', department: 'Information Technology', year: '1' },
+                    { serial: 11, studentId: '23IT001', studentName: 'Harini K', name: 'Harini K', department: 'Information Technology', year: '2' },
+                    
+                    // Tamil
+                    { serial: 12, studentId: '24TM001', studentName: 'Iniya M', name: 'Iniya M', department: 'Tamil', year: '1' },
+                    { serial: 13, studentId: '24TM002', studentName: 'Janani S', name: 'Janani S', department: 'Tamil', year: '1' },
+                    { serial: 14, studentId: '23TM001', studentName: 'Karthik V', name: 'Karthik V', department: 'Tamil', year: '2' },
+                    
+                    // English
+                    { serial: 15, studentId: '24EN001', studentName: 'Lakshmi R', name: 'Lakshmi R', department: 'English', year: '1' },
+                    { serial: 16, studentId: '24EN002', studentName: 'Meena S', name: 'Meena S', department: 'English', year: '1' },
+                    { serial: 17, studentId: '23EN001', studentName: 'Naveen K', name: 'Naveen K', department: 'English', year: '2' }
+                ];
+                
+                // Add students
+                let existingStudents = JSON.parse(localStorage.getItem('students')) || [];
+                sampleStudents.forEach(student => {
+                    const exists = existingStudents.some(s => s.studentId === student.studentId);
+                    if (!exists) {
+                        existingStudents.push(student);
+                    }
+                });
+                localStorage.setItem('students', JSON.stringify(existingStudents));
+                
+                // Create sample attendance for last 3 days
+                const today = new Date();
+                const ledger = JSON.parse(localStorage.getItem('all_attendance_ledger')) || [];
+                
+                for (let i = 0; i < 3; i++) {
+                    const date = new Date(today);
+                    date.setDate(today.getDate() - i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    
+                    // Computer Science Year 1
+                    const cs1Students = existingStudents.filter(s => s.department === 'Computer Science' && s.year === '1');
+                    if (cs1Students.length > 0) {
+                        const records = cs1Students.map(s => ({
+                            studentId: s.studentId,
+                            studentName: s.studentName,
+                            status: Math.random() > 0.2 ? 'present' : 'absent'
+                        }));
+                        
+                        // Remove existing record for this date
+                        const existingIndex = ledger.findIndex(l => l.date === dateStr && l.department === 'Computer Science' && l.year === '1');
+                        if (existingIndex >= 0) {
+                            ledger.splice(existingIndex, 1);
+                        }
+                        
+                        ledger.push({
+                            date: dateStr,
+                            department: 'Computer Science',
+                            year: '1',
+                            records: records
+                        });
+                    }
+                }
+                
+                localStorage.setItem('all_attendance_ledger', JSON.stringify(ledger));
+                
+                alert('✅ System initialized successfully!\n\n' +
+                      `- Added ${sampleStudents.length} sample students\n` +
+                      '- Created 3 days of sample attendance\n\n' +
+                      'Click "Run All Tests" to verify.');
+                
+                runAllTests();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ WARNING: This will delete ALL data!\n\n- All students\n- All attendance records\n- User session\n\nAre you sure?')) {
+                if (confirm('FINAL CONFIRMATION: Delete everything?')) {
+                    localStorage.removeItem('students');
+                    localStorage.removeItem('all_attendance_ledger');
+                    localStorage.removeItem('currentUser');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('department');
+                    localStorage.removeItem('year');
+                    
+                    alert('✅ All data cleared! Reloading page...');
+                    location.reload();
+                }
+            }
+        }
+
+        // Run tests on page load
+        window.onload = function() {
+            runAllTests();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+/* ==========================================================================
+   attendance.css - Styles for Attendance Entry Page (attendance.html)
+   ========================================================================== */
+
+.attendance-page-container {
+    max-width: 950px;
+    width: 92%;
+    margin: 25px auto 40px auto;
+}
+
+.attendance-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin: 15px 0 20px 0;
+}
+
+#attendanceDate {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    color-scheme: dark;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+#attendanceDate::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+/* Stats counter bar */
+.attendance-stats-bar {
+    margin: 4px auto;
+    display: inline-flex;
+    gap: 18px;
+    padding: 8px 20px;
+    background: rgba(0, 0, 0, 0.16);
+    border-radius: 20px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    align-items: center;
+}
+
+.attendance-stats-bar .stat-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.attendance-stats-bar .stat-present {
+    color: #4ade80;
+}
+
+.attendance-stats-bar .stat-absent {
+    color: #f87171;
+}
+
+/* Single-Ball Interactive Toggle */
+.att-ball-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    padding: 6px 14px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    transition: all 0.2s ease;
+}
+
+.att-ball-label:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.att-ball-check {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+}
+
+.att-ball {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #22c55e;
+    background: rgba(34, 197, 94, 0.25);
+    display: inline-block;
+    position: relative;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.35);
+    flex-shrink: 0;
+}
+
+.att-ball::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ffffff;
+    transition: transform 0.2s ease;
+}
+
+.att-ball.is-absent,
+.att-ball-check:checked + .att-ball {
+    border-color: #ef4444;
+    background: #ef4444;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
+}
+
+.att-ball.is-absent::after,
+.att-ball-check:checked + .att-ball::after {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.att-text {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 3px 12px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.text-present {
+    color: #4ade80;
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.text-absent {
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.3);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+}
+
+.attendance-actions {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    align-items: center;
+}

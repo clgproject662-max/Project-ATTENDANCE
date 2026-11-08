@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Student Data</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .form-section {
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, .4);
+            background: rgba(255, 255, 255, .2);
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .form-group select option {
+            background: #667eea;
+            color: #fff;
+        }
+
+        #previewSection {
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        #previewSection h4 {
+            color: white;
+            margin-top: 0;
+        }
+
+        #studentPreview {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            padding: 15px;
+        }
+
+        #previewStats {
+            color: #ffeb3b;
+            text-align: center;
+        }
+
+        #messageArea {
+            min-height: 30px;
+        }
+
+        .warning-text {
+            color: #ff6b6b !important;
+            font-weight: bold;
+        }
+
+        .success-text {
+            color: #51cf66 !important;
+            font-weight: bold;
+        }
+
+        h3 {
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <img src="img/logo.png" alt="Logo" class="logo">
+        <h2 class="center" style="padding-left: 35%;">College Attendance System</h2>
+    </header>
+
+    <div class="container center">
+        <h2 id="userInfo"></h2>
+        <h3 style="color: white;">Delete Student Data by Department & Year</h3>
+
+        <div class="form-section" style="max-width: 500px; margin: 0 auto;">
+            <div class="form-group">
+                <label for="deleteDepartment">Select Department:</label>
+                <select id="deleteDepartment">
+                    <option value="">-- Select Department --</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Tamil">Tamil</option>
+                    <option value="English">English</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="deleteYear">Select Year:</label>
+                <select id="deleteYear">
+                    <option value="">-- Select Year --</option>
+                    <option value="1">Year 1</option>
+                    <option value="2">Year 2</option>
+                    <option value="3">Year 3</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin: 20px 0; text-align: center;">
+                <button onclick="previewStudents()" style="background-color: #007bff; margin-right: 10px;">Preview Students</button>
+                <button onclick="deleteSelectedData()" class="red">Delete Data</button>
+            </div>
+        </div>
+
+        <div id="previewSection" style="margin-top: 30px; display: none;">
+            <h4>Students to be Deleted:</h4>
+            <div id="studentPreview" style="text-align: left; padding: 15px; max-height: 300px; overflow-y: auto;">
+                <!-- Student list will appear here -->
+            </div>
+            <div id="previewStats" style="margin: 15px 0;">
+                <!-- Statistics will appear here -->
+            </div>
+        </div>
+
+        <div class="center" style="margin-top: 30px;">
+            <button onclick="goBackToAdmin()">Back to Admin Panel</button>
+        </div>
+
+        <div id="messageArea" class="center" style="margin-top: 20px;">
+            <!-- Messages will appear here -->
+        </div>
+    </div>
+
+    <script src="deletedata.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Student Registration Request</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .request-container {
+            max-width: 650px;
+            margin: 30px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-title {
+            color: white;
+            font-size: 26px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .staff-info-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            text-align: center;
+            color: white;
+            font-size: 15px;
+        }
+
+        .staff-info-box strong {
+            color: #fbbf24;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .form-group label .required {
+            color: #ff6b6b;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .form-group select option {
+            background: #1e293b;
+            color: white;
+        }
+
+        .form-group input:disabled,
+        .form-group select:disabled {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: not-allowed;
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-group textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn-submit {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: #1d4ed8;
+        }
+
+        .btn-submit:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .message-area {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        .message-area.success {
+            background: rgba(76, 175, 80, 0.25);
+            border: 1px solid #4caf50;
+            color: #86efac;
+        }
+
+        .message-area.error {
+            background: rgba(244, 67, 54, 0.25);
+            border: 1px solid #f44336;
+            color: #fca5a5;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.25);
+            border-top: 4px solid #60a5fa;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 0.9s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .request-container {
+                margin: 15px;
+                padding: 18px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <img src="logo.png" alt="Logo" class="logo" onerror="this.src='logo.png'">
+        <h2 class="center" style="padding-left: 35%;">College Attendance System</h2>
+    </header>
+
+    <div class="request-container">
+        <h1 class="page-title">Staff Student Registration Request</h1>
+
+        <div class="staff-info-box" id="staffInfo">
+            <strong>Logged-in Staff:</strong> <span id="staffName">Loading...</span><br>
+            <strong>Assigned Class:</strong> <span id="staffAssignedClassDisplay">Loading...</span>
+        </div>
+
+        <form id="requestForm" onsubmit="handleSendRequest(event)">
+            <!-- 1. Student Register Number / Roll Number -->
+            <div class="form-group">
+                <label for="studentId">1. Student Register Number / Roll Number <span class="required">*</span></label>
+                <input type="text" id="studentId" placeholder="e.g., 26UCS001" required style="text-transform: uppercase;">
+            </div>
+
+            <!-- 2. Student Name -->
+            <div class="form-group">
+                <label for="studentName">2. Student Name <span class="required">*</span></label>
+                <input type="text" id="studentName" placeholder="Enter student full name" required>
+            </div>
+
+            <!-- 3. Department -->
+            <div class="form-group">
+                <label for="department">3. Department <span class="required">*</span></label>
+                <select id="department" required>
+                    <option value="">Select Department</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Tamil">Tamil</option>
+                    <option value="English">English</option>
+                </select>
+            </div>
+
+            <!-- 4. Academic Year -->
+            <div class="form-group">
+                <label for="year">4. Academic Year <span class="required">*</span></label>
+                <select id="year" required>
+                    <option value="">Select Academic Year</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                </select>
+            </div>
+
+            <!-- 5. Class assigned to the logged-in Staff member -->
+            <div class="form-group">
+                <label for="assignedClass">5. Class Assigned to Logged-in Staff Member <span class="required">*</span></label>
+                <input type="text" id="assignedClass" readonly disabled style="font-weight: bold; color: #fde047;">
+            </div>
+
+            <!-- Optional details -->
+            <div class="form-group">
+                <label for="section">Section (Optional)</label>
+                <input type="text" id="section" placeholder="e.g., A, B">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Student Phone (Optional)</label>
+                <input type="tel" id="phone" placeholder="Enter student phone number">
+            </div>
+
+            <div class="form-group">
+                <label for="parentPhone">Parent Phone (Optional)</label>
+                <input type="tel" id="parentPhone" placeholder="Enter parent phone number">
+            </div>
+
+            <div class="form-group">
+                <label for="reason">Reason / Notes (Optional)</label>
+                <textarea id="reason" placeholder="State any additional information or reason for this request..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" id="btnSubmitRequest" class="btn btn-submit">Send Request to Admin</button>
+                <button type="button" class="btn btn-cancel" onclick="location.href='home.html'">Back to Dashboard</button>
+            </div>
+        </form>
+
+        <div id="messageArea" class="message-area"></div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div id="loadingText">Submitting request to Admin...</div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let isSubmitting = false;
+
+        function checkStaffAuth() {
+            const user = getCurrentUser();
+            if (!user) {
+                alert("Please log in first.");
+                window.location.href = "index.html";
+                return null;
+            }
+            if (user.role === "admin") {
+                alert("Admins cannot submit staff student registration requests.");
+                window.location.href = "admin.html";
+                return null;
+            }
+            return user;
+        }
+
+        async function initStaffRequestForm() {
+            const cachedUser = checkStaffAuth();
+            if (!cachedUser) return;
+
+            // Always fetch fresh staff profile from the backend to get
+            // authoritative department / year — localStorage may be stale
+            // (e.g. first login before fix, or local-fallback token).
+            let user = cachedUser;
+            try {
+                const token = localStorage.getItem('token');
+                if (token && !token.startsWith('local-token-')) {
+                    const res = await fetch(`${BASE_URL}/auth/me`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.success && data.user) {
+                            // Merge fresh data into the cached user and persist
+                            user = { ...cachedUser, ...data.user };
+                            localStorage.setItem('currentUser', JSON.stringify(user));
+                        }
+                    }
+                }
+            } catch (e) {
+                // Network error — fall back to cached user silently
+                console.warn('Could not refresh staff profile from server:', e.message);
+            }
+
+            const staffDept = (user.department || '').trim();
+            const staffYear = String(user.year || '').trim();
+
+            // Guard: if department is still empty after the fresh fetch,
+            // show a clear error instead of "undef".
+            if (!staffDept) {
+                document.getElementById('staffAssignedClassDisplay').textContent = 'Department not set — contact admin';
+                document.getElementById('staffName').textContent = user.name || user.username;
+                showMessage('Your account does not have a department assigned. Please contact the administrator.', 'error');
+                document.getElementById('btnSubmitRequest').disabled = true;
+                return;
+            }
+
+            const classCode = (staffDept.toLowerCase().includes('computer') ? 'CS'
+                             : staffDept.toLowerCase().includes('information') ? 'IT'
+                             : staffDept.toLowerCase().includes('tamil') ? 'TAM'
+                             : staffDept.toLowerCase().includes('english') ? 'ENG'
+                             : staffDept.substring(0, 3).toUpperCase()) + (staffYear || '');
+
+            document.getElementById('staffName').textContent = `${user.name || user.username} (${user.username})`;
+            document.getElementById('staffAssignedClassDisplay').textContent =
+                `${classCode} — ${staffDept}${staffYear ? ', Year ' + staffYear : ''}`;
+
+            // Lock department and year to staff's assigned class
+            const deptSelect = document.getElementById('department');
+            const yearSelect = document.getElementById('year');
+            const assignedClassInput = document.getElementById('assignedClass');
+
+            deptSelect.value = staffDept;
+            deptSelect.disabled = true;
+
+            if (staffYear && staffYear !== 'All') {
+                yearSelect.value = staffYear;
+                yearSelect.disabled = true;
+            }
+
+            assignedClassInput.value = `${classCode} — ${staffDept}${staffYear ? ', Year ' + staffYear : ''}`;
+        }
+
+        function showMessage(text, type = 'success') {
+            const msgEl = document.getElementById("messageArea");
+            if (!msgEl) return;
+            msgEl.textContent = text;
+            msgEl.className = `message-area ${type}`;
+            msgEl.style.display = 'block';
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (msgEl) msgEl.style.display = 'none';
+                }, 6000);
+            }
+        }
+
+        function setLoading(active) {
+            const overlay = document.getElementById("loadingOverlay");
+            const btn = document.getElementById("btnSubmitRequest");
+            if (overlay) overlay.className = active ? 'loading-overlay active' : 'loading-overlay';
+            if (btn) btn.disabled = active;
+            isSubmitting = active;
+        }
+
+        async function handleSendRequest(e) {
+            e.preventDefault();
+
+            if (isSubmitting) return;
+
+            // Re-read the possibly-refreshed user from localStorage
+            const user = checkStaffAuth();
+            if (!user) return;
+
+            const studentId = document.getElementById("studentId").value.trim().toUpperCase();
+            const studentName = document.getElementById("studentName").value.trim();
+            // Read from the (now locked) selects; fall back to user profile
+            const department = (document.getElementById("department").value.trim()) || (user.department || '').trim();
+            const year = (document.getElementById("year").value.trim()) || String(user.year || '').trim();
+            const section = document.getElementById("section").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const parentPhone = document.getElementById("parentPhone").value.trim();
+            const reason = document.getElementById("reason").value.trim();
+
+            // 1. Validate required fields
+            if (!studentId) {
+                showMessage("Please enter the Student Register Number / Roll Number", "error");
+                document.getElementById("studentId").focus();
+                return;
+            }
+            if (!studentName) {
+                showMessage("Please enter the Student Name", "error");
+                document.getElementById("studentName").focus();
+                return;
+            }
+            if (!department) {
+                showMessage("Please select Department", "error");
+                document.getElementById("department").focus();
+                return;
+            }
+            if (!year) {
+                showMessage("Please select Academic Year", "error");
+                document.getElementById("year").focus();
+                return;
+            }
+
+            // 2. Validate that the requested class belongs to the logged-in Staff member
+            if (user.role === 'staff') {
+                const assignedDept = (user.department || '').trim();
+                const assignedYear = String(user.year || '').trim();
+
+                if (!assignedDept) {
+                    showMessage('Your account does not have a department assigned. Please contact the administrator.', 'error');
+                    return;
+                }
+
+                if (department.toLowerCase() !== assignedDept.toLowerCase()) {
+                    showMessage(`You can only submit requests for your assigned department: ${assignedDept}`, 'error');
+                    return;
+                }
+                if (assignedYear && assignedYear !== 'All' && String(year) !== assignedYear) {
+                    showMessage(`You can only submit requests for your assigned year: Year ${assignedYear}`, 'error');
+                    return;
+                }
+            }
+
+            // 3. Local check against main student collection to prevent duplicate register numbers
+            const localStudents = JSON.parse(localStorage.getItem("students")) || [];
+            const studentAlreadyExists = localStudents.some(s =>
+                String(s.studentId || s.id).trim().toUpperCase() === studentId
+            );
+            if (studentAlreadyExists) {
+                showMessage(`Student with Register Number '${studentId}' is already registered in the system!`, "error");
+                document.getElementById("studentId").focus();
+                return;
+            }
+
+            setLoading(true);
+
+            const payload = {
+                studentRegisterNumber: studentId,
+                studentId: studentId,
+                studentName: studentName,
+                department: department,
+                academicYear: year,
+                year: year,
+                section: section,
+                phone: phone,
+                parentPhone: parentPhone,
+                reason: reason
+            };
+
+            try {
+                const token = localStorage.getItem("token");
+                const response = await fetch(`${BASE_URL}/student-requests`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                setLoading(false);
+
+                if (response.ok && data.success) {
+                    showMessage(`✅ Request submitted successfully! Status is set to 'Pending'. Waiting for Admin approval.`, "success");
+                    document.getElementById("studentId").value = "";
+                    document.getElementById("studentName").value = "";
+                    document.getElementById("section").value = "";
+                    document.getElementById("phone").value = "";
+                    document.getElementById("parentPhone").value = "";
+                    document.getElementById("reason").value = "";
+
+                    setTimeout(() => {
+                        window.location.href = "my-requests.html";
+                    }, 2200);
+                } else {
+                    showMessage(`❌ ${data.message || 'Failed to submit request'}`, "error");
+                }
+            } catch (err) {
+                setLoading(false);
+                console.error("Submission error:", err);
+                showMessage("❌ Network error connecting to backend API. Please make sure backend is running.", "error");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initStaffRequestForm();
+        });
+    </script>
+</body>
+
+</html>

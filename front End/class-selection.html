@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Class - Staff</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="header">
+        <img src="logo.png" alt="Logo" class="logo" onerror="this.src='logo.png'">
+        <h2 class="center" style="padding-left: 35%;">College Attendance System</h2>
+    </header>
+
+    <div class="container center" style="padding-top: 60px; padding-bottom: 50px;">
+        <h2 style="color: #ffffff; margin-bottom: 8px;">Select Your Class</h2>
+        <p id="staffName" style="color: rgba(255, 255, 255, 0.8); margin-bottom: 30px;">Logged in as CS Staff</p>
+
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            <button onclick="selectClass('CS1')" style="font-size: 16px; padding: 18px 28px; min-width: 220px; background-color: #2563eb;">
+                CS1<br><span style="font-size: 13px; font-weight: normal;">Computer Science 1st Year</span>
+            </button>
+            <button onclick="selectClass('CS2')" style="font-size: 16px; padding: 18px 28px; min-width: 220px; background-color: #28a745;">
+                CS2<br><span style="font-size: 13px; font-weight: normal;">Computer Science 2nd Year</span>
+            </button>
+            <button onclick="selectClass('CS3')" style="font-size: 16px; padding: 18px 28px; min-width: 220px; background-color: #7c3aed;">
+                CS3<br><span style="font-size: 13px; font-weight: normal;">Computer Science 3rd Year</span>
+            </button>
+        </div>
+
+        <div id="selectionMsg" class="center" style="margin-top: 25px; font-weight: 500;"></div>
+
+        <div style="margin-top: 35px;">
+            <button class="red" onclick="logout()" style="padding: 8px 24px;">Logout</button>
+        </div>
+    </div>
+
+    <script src="class-selection.js"></script>
+</body>
+
+</html>

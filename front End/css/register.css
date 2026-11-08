@@ -1,0 +1,89 @@
+/* ==========================================================================
+   register.css - Styles for Student Registration Page (register.html)
+   ========================================================================== */
+
+.register-card {
+    max-width: 560px;
+    width: 90%;
+    margin: 40px auto;
+    padding: 36px 30px;
+    background: rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.register-card h3 {
+    margin: 0 0 20px 0;
+    font-size: 1.45rem;
+    color: #ffffff;
+}
+
+.register-manual-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 380px;
+    margin: 0 auto 20px auto;
+}
+
+.register-manual-section input {
+    width: 100%;
+    margin: 0;
+    padding: 11px 16px;
+    border-radius: 8px;
+}
+
+.register-divider {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.register-divider::before,
+.register-divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.register-divider span {
+    padding: 0 12px;
+}
+
+#uploadForm {
+    margin: 15px auto;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#uploadForm input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px dashed rgba(255, 255, 255, 0.45);
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 0;
+}
+
+#result {
+    margin: 15px auto;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.register-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}

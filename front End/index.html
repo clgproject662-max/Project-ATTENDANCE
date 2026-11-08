@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Attendance System - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+    <header class="header">
+        <img src="img/logo.png" alt="Logo" class="logo" onerror="this.src='logo.png'">
+        <h2 class="center" style="padding-left: 35%;">College Attendance System</h2>
+    </header>
+    
+    <div class="center" style="padding-top: 180px;">
+        <h2 style="color: #ffffff; margin-bottom: 20px;"></h2>
+        <div>
+            <input id="loginUser" placeholder="Username" autocomplete="username" autofocus>
+            <input id="loginPass" type="password" placeholder="Password" autocomplete="current-password">
+        </div>
+        <div style="margin-top: 10px;">
+            <button onclick="login()" style="min-width: 120px;">Login</button>
+        </div>
+        <div id="loginMsg" class="center" style="margin-top: 15px; font-weight: 500;"></div>
+        <div style="margin-top: 25px; color: rgba(255, 255, 255, 0.75); font-size: 13px;">
+           
+        </div>
+    </div>
+
+    <script src="script.js?v=20261030"></script>
+</body>
+
+</html>

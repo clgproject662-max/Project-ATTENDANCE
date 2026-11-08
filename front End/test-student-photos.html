@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Student Photos - Enhanced Students Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            margin-top: 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.2s ease;
+        }
+        button:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-primary {
+            background: #007bff;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success {
+            background: rgba(40, 167, 69, 0.3);
+            border: 2px solid #28a745;
+        }
+        .error {
+            background: rgba(220, 53, 69, 0.3);
+            border: 2px solid #dc3545;
+        }
+        .info {
+            background: rgba(23, 162, 184, 0.3);
+            border: 2px solid #17a2b8;
+        }
+        ul {
+            line-height: 1.8;
+        }
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ Test Enhanced Students Data with Photos</h1>
+
+        <div class="section">
+            <h2>📋 What's New?</h2>
+            <ul>
+                <li><strong>Photo Display:</strong> Student photos shown as circular thumbnails in the table</li>
+                <li><strong>Initials Placeholder:</strong> If no photo available, shows student initials</li>
+                <li><strong>Full Details Modal:</strong> Click "View Details" to see all student information including large photo</li>
+                <li><strong>Additional Fields:</strong> Email, Phone, DOB, Address, Parent Info now supported</li>
+                <li><strong>Enhanced Table:</strong> Reorganized columns with Photo and Full Details</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>🔧 Testing Instructions</h2>
+            <ol>
+                <li>Add sample students with photos to localStorage</li>
+                <li>Open Students Data page (studentsdata.html)</li>
+                <li>Select a department to view students</li>
+                <li>Check photo thumbnails display correctly</li>
+                <li>Click "View Details" to see full student information</li>
+                <li>Test photo error handling (broken links show initials)</li>
+                <li>Download PDF report (photos not included in PDF)</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Quick Actions</h2>
+            <button onclick="addSampleStudents()">Add Sample Students with Photos</button>
+            <button class="btn-primary" onclick="viewCurrentStudents()">View Current Students</button>
+            <button class="btn-danger" onclick="clearAllStudents()">Clear All Students</button>
+            <button class="btn-primary" onclick="window.location.href='studentsdata.html'">Open Students Data Page</button>
+        </div>
+
+        <div id="output"></div>
+
+        <div class="section">
+            <h2>📝 Student Model Fields</h2>
+            <pre>
+{
+    studentName: String (required)
+    studentId: String (required, unique)
+    serial: Number
+    department: String (required)
+    year: String (required)
+    status: 'active' | 'inactive'
+    <strong style="color: #51cf66;">photo: String (URL or base64)</strong>
+    <strong style="color: #51cf66;">email: String</strong>
+    <strong style="color: #51cf66;">phone: String</strong>
+    <strong style="color: #51cf66;">dateOfBirth: Date</strong>
+    <strong style="color: #51cf66;">address: String</strong>
+    <strong style="color: #51cf66;">parentName: String</strong>
+    <strong style="color: #51cf66;">parentPhone: String</strong>
+    timestamps: true
+}
+            </pre>
+        </div>
+
+        <div class="section">
+            <h2>💡 Photo URL Examples</h2>
+            <p>You can use:</p>
+            <ul>
+                <li><strong>Public URLs:</strong> https://randomuser.me/api/portraits/men/1.jpg</li>
+                <li><strong>Avatar Services:</strong> https://ui-avatars.com/api/?name=John+Doe</li>
+                <li><strong>Base64:</strong> data:image/png;base64,iVBORw0KG...</li>
+                <li><strong>Placeholder:</strong> https://via.placeholder.com/200</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function addSampleStudents() {
+            const sampleStudents = [
+                {
+                    id: "CS2021001",
+                    studentId: "CS2021001",
+                    name: "Rajesh Kumar",
+                    studentName: "Rajesh Kumar",
+                    serial: 1,
+                    department: "Computer Science",
+                    year: "3",
+                    status: "active",
+                    photo: "https://randomuser.me/api/portraits/men/1.jpg",
+                    email: "rajesh.kumar@college.edu",
+                    phone: "9876543210",
+                    dateOfBirth: "2003-05-15",
+                    address: "123 Gandhi Street, Chennai, Tamil Nadu",
+                    parentName: "Kumar Rajan",
+                    parentPhone: "9876543211"
+                },
+                {
+                    id: "CS2021002",
+                    studentId: "CS2021002",
+                    name: "Priya Sharma",
+                    studentName: "Priya Sharma",
+                    serial: 2,
+                    department: "Computer Science",
+                    year: "3",
+                    status: "active",
+                    photo: "https://randomuser.me/api/portraits/women/2.jpg",
+                    email: "priya.sharma@college.edu",
+                    phone: "9876543212",
+                    dateOfBirth: "2003-08-22",
+                    address: "456 Anna Nagar, Chennai, Tamil Nadu",
+                    parentName: "Sharma Ravi",
+                    parentPhone: "9876543213"
+                },
+                {
+                    id: "CS2021003",
+                    studentId: "CS2021003",
+                    name: "Arjun Patel",
+                    studentName: "Arjun Patel",
+                    serial: 3,
+                    department: "Computer Science",
+                    year: "2",
+                    status: "active",
+                    photo: "https://randomuser.me/api/portraits/men/3.jpg",
+                    email: "arjun.patel@college.edu",
+                    phone: "9876543214",
+                    dateOfBirth: "2004-03-10",
+                    address: "789 Nehru Road, Chennai, Tamil Nadu",
+                    parentName: "Patel Vijay",
+                    parentPhone: "9876543215"
+                },
+                {
+                    id: "IT2021001",
+                    studentId: "IT2021001",
+                    name: "Sneha Reddy",
+                    studentName: "Sneha Reddy",
+                    serial: 1,
+                    department: "Information Technology",
+                    year: "3",
+                    status: "active",
+                    photo: "https://randomuser.me/api/portraits/women/4.jpg",
+                    email: "sneha.reddy@college.edu",
+                    phone: "9876543216",
+                    dateOfBirth: "2003-11-05",
+                    address: "321 Mount Road, Chennai, Tamil Nadu",
+                    parentName: "Reddy Mohan",
+                    parentPhone: "9876543217"
+                },
+                {
+                    id: "IT2021002",
+                    studentId: "IT2021002",
+                    name: "Vikram Singh",
+                    studentName: "Vikram Singh",
+                    serial: 2,
+                    department: "Information Technology",
+                    year: "2",
+                    status: "active",
+                    email: "vikram.singh@college.edu",
+                    phone: "9876543218",
+                    dateOfBirth: "2004-07-18",
+                    address: "654 Poonamallee High Road, Chennai, Tamil Nadu",
+                    parentName: "Singh Rajendra",
+                    parentPhone: "9876543219"
+                    // No photo - will show initials "VS"
+                }
+            ];
+
+            // Load existing students
+            let students = JSON.parse(localStorage.getItem('students')) || [];
+            
+            // Add only new students (avoid duplicates)
+            sampleStudents.forEach(sample => {
+                const exists = students.some(s => 
+                    (s.studentId || s.id) === (sample.studentId || sample.id)
+                );
+                if (!exists) {
+                    students.push(sample);
+                }
+            });
+
+            localStorage.setItem('students', JSON.stringify(students));
+
+            const output = document.getElementById('output');
+            output.innerHTML = `
+                <div class="message success">
+                    ✅ <strong>Success!</strong> Added ${sampleStudents.length} sample students to localStorage.<br>
+                    <em>Total students now: ${students.length}</em>
+                </div>
+            `;
+        }
+
+        function viewCurrentStudents() {
+            const students = JSON.parse(localStorage.getItem('students')) || [];
+            const output = document.getElementById('output');
+
+            if (students.length === 0) {
+                output.innerHTML = `
+                    <div class="message info">
+                        ℹ️ <strong>No students found.</strong> Click "Add Sample Students" to populate data.
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `<div class="message info">📊 <strong>Current Students (${students.length} total):</strong></div>`;
+            html += '<pre style="max-height: 400px; overflow-y: auto;">';
+            html += JSON.stringify(students, null, 2);
+            html += '</pre>';
+            
+            output.innerHTML = html;
+        }
+
+        function clearAllStudents() {
+            if (confirm('⚠️ Are you sure you want to delete ALL students from localStorage?')) {
+                localStorage.removeItem('students');
+                localStorage.removeItem('attendance');
+                
+                const output = document.getElementById('output');
+                output.innerHTML = `
+                    <div class="message success">
+                        ✅ <strong>Cleared!</strong> All students and attendance records have been removed.
+                    </div>
+                `;
+            }
+        }
+
+        // Show initial status
+        window.onload = function() {
+            const students = JSON.parse(localStorage.getItem('students')) || [];
+            const output = document.getElementById('output');
+            output.innerHTML = `
+                <div class="message info">
+                    ℹ️ <strong>Current Status:</strong> ${students.length} students in localStorage
+                </div>
+            `;
+        };
+    </script>
+</body>
+</html>

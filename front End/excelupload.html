@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Student Excel Upload</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- SheetJS for reading Excel files in the browser -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        .template-link {
+            display: inline-block;
+            background: #17a2b8;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .template-link:hover {
+            background: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+     <header class="header">
+        <img src="img/logo.png" alt="Logo" class="logo">
+        <h2 class="center" style="padding-left: 35%;">College Attendance System</h2>
+    </header>
+
+    <div class="container center">
+
+        <h2>Upload Students</h2>
+        
+        <p style="text-align: center; margin-bottom: 15px;">
+            <a href="excel-upload-template.html" class="template-link" target="_blank">
+                📋 Download Upload Template (with all column details)
+            </a>
+        </p>
+
+        <form id="uploadForm">
+
+            <label>Department</label>
+            <select id="department" required>
+                <option value="" disabled selected>Select Department</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Tamil">Tamil</option>
+                <option value="English">English</option>
+            </select>
+
+            <label>Year</label>
+            <select id="year" required>
+                <option value="" disabled selected>Select Year</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+            </select>
+
+            <label>Select Excel File</label>
+            <input type="file" id="file" accept=".xlsx,.xls" required>
+
+            <button type="submit">Upload</button>
+
+        </form>
+
+        <div id="result"></div>
+
+        <br>
+        <button class="red" onclick="goBack()">Back</button>
+
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:5000/api';
+
+        function goBack() {
+            let user = null;
+            try {
+                user = JSON.parse(localStorage.getItem("currentUser"));
+            } catch (e) {}
+
+            if (user && user.role === "admin") {
+                window.location.href = "admin.html";
+            } else {
+                window.location.href = "home.html";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            let user = null;
+            try {
+                user = JSON.parse(localStorage.getItem("currentUser"));
+            } catch (e) {}
+
+            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            const isAllowed = user.role === "admin" || (user.role === "staff" && user.username === "cs1");
+            if (!isAllowed) {
+                alert("Access denied. Only Admin or CS Year 1 Staff can upload students.");
+                window.location.href = "home.html";
+            }
+        });
+
+        // Submit handler – send Excel to server
+document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const department = document.getElementById("department").value;
+    const year = document.getElementById("year").value;
+    const fileInput = document.getElementById("file");
+    const token = localStorage.getItem("token");
+
+    if (!department || !year) {
+        document.getElementById("result").innerHTML = "<span style='color:red'>Please select Department and Year.</span>";
+        return;
+    }
+    if (!fileInput.files[0]) {
+        document.getElementById("result").innerHTML = "<span style='color:red'>Please select an Excel file.</span>";
+        return;
+    }
+    if (!token) {
+        document.getElementById("result").innerHTML = "<span style='color:red'>Not authorized. Please login again.</span>";
+        window.location.href = "index.html";
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    formData.append('department', department);
+    formData.append('year', year);
+
+    try {
+        const response = await fetch(`${BASE_URL}/students/upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData,
+        });
+        const result = await response.json();
+        if (result.success) {
+            document.getElementById("result").innerHTML = `<span style='color:green'>${result.message}. Students added: ${result.stats.insertedStudents}, updated: ${result.stats.updatedStudents}, attendance records: ${result.stats.insertedAttendance}</span>`;
+        } else {
+            document.getElementById("result").innerHTML = `<span style='color:red'>Error: ${result.message || 'Upload failed'}</span>`;
+        }
+    } catch (err) {
+        console.error(err);
+        document.getElementById("result").innerHTML = "<span style='color:red'>Network error while uploading.</span>";
+    }
+});
+
+
+            // NOTE: The client‑side parsing and localStorage handling for Excel uploads has been removed.
+            // The upload is now performed via a single POST to the backend endpoint `${BASE_URL}/students/upload`.
+            // The server processes the file, updates the database, and returns a summary.
+            // This simplifies the UI and ensures data persistence in MongoDB Atlas.
+
+    </script>
+
+</body>
+
+</html>

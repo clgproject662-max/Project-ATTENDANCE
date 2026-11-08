@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Debug - JWT Token Test</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .debug-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .debug-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .debug-card h3 {
+            margin-top: 0;
+            color: white;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .status.success {
+            background: rgba(40, 167, 69, 0.3);
+            border: 1px solid #28a745;
+            color: #28a745;
+        }
+
+        .status.error {
+            background: rgba(220, 53, 69, 0.3);
+            border: 1px solid #dc3545;
+            color: #dc3545;
+        }
+
+        .status.warning {
+            background: rgba(255, 193, 7, 0.3);
+            border: 1px solid #ffc107;
+            color: #ffc107;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h2 class="center" style="padding-left: 35%;">Token Debug Tool</h2>
+    </header>
+
+    <div class="debug-container">
+        <h2 style="text-align: center; color: white;">Token Debug & Test</h2>
+
+        <!-- Current Token Info -->
+        <div class="debug-card">
+            <h3>📊 Current Session Token</h3>
+            <div id="currentTokenInfo">
+                <p>No session detected.</p>
+            </div>
+        </div>
+
+        <!-- JWT Secret Configuration -->
+        <div class="debug-card">
+            <h3>🔑 Backend Configuration</h3>
+            <pre>JWT_SECRET: 7708585916vickysenthil6789
+JWT_EXPIRES_IN: 100week
+MONGODB_URI: (configured)</pre>
+        </div>
+
+        <!-- Login Form -->
+        <div class="debug-card">
+            <h3>🔐 Login Test</h3>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="debugUsername" value="cs1" placeholder="Username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="debugPassword" value="cs123" placeholder="Password">
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" onclick="testLogin()">Test Login</button>
+                <button class="btn-secondary" onclick="checkBackendStatus()">Check Backend Status</button>
+                <button class="btn-danger" onclick="clearSession()">Clear Session</button>
+            </div>
+        </div>
+
+        <!-- Test API Endpoint -->
+        <div class="debug-card">
+            <h3>🧪 Test API Endpoint</h3>
+            <button class="btn-primary" onclick="testStudentsAPI()">Test GET /api/students</button>
+            <div id="apiTestResult" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="debug-card">
+            <h3>⚡ Actions</h3>
+            <button class="btn-secondary" onclick="refreshCurrentPage()">Refresh Current Page</button>
+            <button class="btn-primary" onclick="goToAdmin()">Go to Admin</button>
+            <button class="btn-primary" onclick="goToHome()">Go to Staff Home</button>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:5000/api';
+
+        // Check if user is logged in
+        function getCurrentUser() {
+            try {
+                return JSON.parse(localStorage.getItem("currentUser"));
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Display current token info
+        function displayCurrentTokenInfo() {
+            const container = document.getElementById("currentTokenInfo");
+            const user = getCurrentUser();
+            const token = localStorage.getItem("token");
+
+            if (!user && !token) {
+                container.innerHTML = '<p style="color: #fbbf24;">No session found. Please login first.</p>';
+                return;
+            }
+
+            let html = '';
+            if (user) {
+                html += `<p><strong>User:</strong> ${user.username || 'N/A'} (${user.role})</p>`;
+                html += `<p><strong>Department:</strong> ${user.department || 'N/A'}</p>`;
+                html += `<p><strong>Year:</strong> ${user.year || 'N/A'}</p>`;
+            }
+            if (token) {
+                const isLocal = token.startsWith('local-token-');
+                const isJWT = !isLocal && token.split('.')[2] && token.split('.')[0];
+                
+                html += `<p><strong>Token Type:</strong> <span style="color: ${isLocal ? '#fbbf24' : '#4caf50'}">${isLocal ? 'Local (Offline)' : 'JWT'}</span></p>`;
+                html += `<p><strong>Token Prefix:</strong> ${token.substring(0, 20)}...</p>`;
+                
+                if (isLocal) {
+                    const username = token.replace('local-token-', '');
+                    html += `<p><strong>Local User:</strong> ${username}</p>`;
+                }
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Test login
+        async function testLogin() {
+            const username = document.getElementById("debugUsername").value.trim();
+            const password = document.getElementById("debugPassword").value.trim();
+
+            if (!username || !password) {
+                alert("Please enter username and password");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("currentUser", JSON.stringify(data.user));
+                    
+                    const tokenType = data.token.startsWith('local-token-') ? 'Local Token' : 'JWT Token';
+                    
+                    document.getElementById("apiTestResult").innerHTML = `
+                        <div class="status success">
+                            ✅ Login successful!
+                        </div>
+                        <p style="color: white; margin-top: 10px;">
+                            Token Type: ${tokenType}<br>
+                            User: ${data.user.username} (${data.user.role})<br>
+                            Department: ${data.user.department}
+                        </p>
+                    `;
+                    
+                    displayCurrentTokenInfo();
+                    alert(`Login successful! Token saved.`);
+                } else {
+                    document.getElementById("apiTestResult").innerHTML = `
+                        <div class="status error">
+                            ❌ Login failed: ${data.message || 'Unknown error'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error("Login error:", error);
+                document.getElementById("apiTestResult").innerHTML = `
+                    <div class="status error">
+                        ❌ Network error: ${error.message}<br>
+                        <small>Is the backend running on port 5000?</small>
+                    </div>
+                `;
+            }
+        }
+
+        // Check backend status
+        async function checkBackendStatus() {
+            try {
+                const response = await fetch(`${BASE_URL}/health`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    const dbStatus = data.database === 'Connected' ? 'Connected' : 'Disconnected';
+                    document.getElementById("apiTestResult").innerHTML = `
+                        <div class="status success">
+                            ✅ Backend is ${data.status === 'OK' ? 'running' : 'not OK'}
+                        </div>
+                        <pre style="color: #fbbf24;">Database: ${dbStatus}
+Service: ${data.service}</pre>
+                    `;
+                } else {
+                    document.getElementById("apiTestResult").innerHTML = `
+                        <div class="status error">
+                            ❌ Backend returned status: ${data.status}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById("apiTestResult").innerHTML = `
+                    <div class="status warning">
+                        ⚠️ Backend not reachable<br>
+                        <small>Is the backend running on port 5000?</small>
+                    </div>
+                `;
+            }
+        }
+
+        // Clear session
+        function clearSession() {
+            localStorage.removeItem("currentUser");
+            localStorage.removeItem("token");
+            localStorage.removeItem("department");
+            localStorage.removeItem("year");
+            
+            document.getElementById("apiTestResult").innerHTML = `
+                <div class="status warning">
+                            ⚠️ Session cleared
+                        </div>
+                    `;
+            
+            displayCurrentTokenInfo();
+        }
+
+        // Test students API
+        async function testStudentsAPI() {
+            const token = localStorage.getItem("token");
+            
+            if (!token) {
+                document.getElementById("apiTestResult").innerHTML = `
+                    <div class="status warning">
+                        ⚠️ No token found. Please login first.
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_URL}/students`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    document.getElementById("apiTestResult").innerHTML = `
+                        <div class="status success">
+                            ✅ API call successful!
+                        </div>
+                        <p style="color: white; margin-top: 10px;">
+                            Total students: ${data.count || 0}
+                        </p>
+                        <pre style="max-height: 200px; overflow-y: auto;">
+${JSON.stringify(data.students || [], null, 2)}</pre
+                    `;
+                } else {
+                    document.getElementById("apiTestResult").innerHTML = `
+                        <div class="status error">
+                            ❌ API call failed: ${data.message || 'Unknown error'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById("apiTestResult").innerHTML = `
+                    <div class="status error">
+                        ❌ Network error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Navigation
+        function goToAdmin() {
+            window.location.href = 'admin.html';
+        }
+
+        function goToHome() {
+            window.location.href = 'home.html';
+        }
+
+        function refreshCurrentPage() {
+            window.location.reload();
+        }
+
+        // Initialize
+        displayCurrentTokenInfo();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Report - Attendance Overview</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        .overview-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .date-filter {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .date-filter label {
+            color: white;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+
+        .date-filter input {
+            margin: 0 10px;
+        }
+
+        .date-filter button {
+            margin: 0 10px;
+            padding: 10px 20px;
+        }
+
+        .department-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .department-title {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .years-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .year-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .year-title {
+            color: #ffeb3b;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .stat-label {
+            color: white;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            font-weight: bold;
+        }
+
+        .stat-total { color: #81c784; }
+        .stat-present { color: #4caf50; }
+        .stat-absent { color: #f44336; }
+        .stat-percentage { color: #ffeb3b; font-size: 16px; }
+
+        .no-data {
+            color: #ff9800;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .summary-stats {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .summary-title {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .summary-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+
+        .summary-label {
+            color: white;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <img src="img/logo.png" alt="Logo" class="logo">
+        <h2 class="center" style="padding-left: 35%;">College Attendance System</h2>
+    </header>
+
+    <div class="overview-container">
+        <h2 id="userInfo" class="center" style="color: white;"></h2>
+        <h3 class="center" style="color: white;">Admin Attendance Report - Overview</h3>
+
+        <!-- Date Filter Section -->
+        <div class="date-filter">
+            <label for="reportFromDate">From Date:</label>
+            <input type="date" id="reportFromDate">
+            
+            <label for="reportToDate">To Date:</label>
+            <input type="date" id="reportToDate">
+            
+            <button onclick="generateAdminReport()">Generate Report</button>
+            <button onclick="downloadAdminReport()" style="background-color: #28a745;">Download Excel</button>
+        </div>
+
+        <!-- Summary Statistics -->
+        <div id="summarySection" class="summary-stats" style="display: none;">
+            <div class="summary-title">Overall Summary</div>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-number" id="totalDepartments">0</div>
+                    <div class="summary-label">Departments</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-number" id="totalClasses">0</div>
+                    <div class="summary-label">Classes</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-number" id="totalStudents">0</div>
+                    <div class="summary-label">Total Students</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-number" id="overallPercentage">0%</div>
+                    <div class="summary-label">Overall Attendance</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department Reports -->
+        <div id="departmentReports">
+            <!-- Department sections will be generated here -->
+        </div>
+
+        <!-- Back Button -->
+        <div class="center" style="margin-top: 30px;">
+            <button onclick="goBackToAdmin()">Back to Admin Panel</button>
+        </div>
+
+        <div id="messageArea" class="center" style="margin-top: 20px; color: white; font-weight: bold;">
+            <!-- Messages will appear here -->
+        </div>
+    </div>
+
+    <script src="adminreport.js"></script>
+
+</body>
+
+</html>

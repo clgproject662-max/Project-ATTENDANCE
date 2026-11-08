@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Student Registration</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+        .test-section { margin: 20px 0; padding: 15px; background: white; border-radius: 8px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Student Registration System Test</h1>
+    
+    <div class="test-section">
+        <h3>Quick Test Registration:</h3>
+        <div id="testResults"></div>
+        <button onclick="runRegistrationTest()">Test Add Student</button>
+        <button onclick="viewAllStudents()">View All Students</button>
+        <button onclick="clearAllStudents()">Clear All Students</button>
+    </div>
+
+    <div class="test-section">
+        <h3>Navigation Links:</h3>
+        <p><a href="index.html">Login Page</a> (admin/admin123)</p>
+        <p><a href="admin.html">Admin Panel</a></p>
+        <p><a href="register.html">Register Student</a> (The Fixed Page)</p>
+    </div>
+
+    <div class="test-section">
+        <h3>Current Students in System:</h3>
+        <div id="studentsList"></div>
+    </div>
+
+    <script>
+        // Set up admin user for testing
+        function setupTestAdmin() {
+            const adminUser = {
+                id: "local_admin",
+                name: "Test Administrator",
+                username: "admin",
+                role: "admin",
+                department: "Administration",
+                year: "All"
+            };
+            localStorage.setItem("currentUser", JSON.stringify(adminUser));
+            localStorage.setItem("token", "local-token-admin");
+        }
+
+        // Test registration functionality
+        function runRegistrationTest() {
+            setupTestAdmin();
+            
+            const testStudent = {
+                serial: Date.now(), // Use timestamp for unique serial
+                studentId: `TEST${Date.now().toString().slice(-4)}`, // Last 4 digits of timestamp
+                studentName: "Test Student " + new Date().toLocaleTimeString(),
+                id: `TEST${Date.now().toString().slice(-4)}`,
+                name: "Test Student " + new Date().toLocaleTimeString(),
+                department: "Computer Science",
+                year: "1"
+            };
+
+            try {
+                // Get existing students
+                let existingStudents = JSON.parse(localStorage.getItem("students")) || [];
+                
+                // Add test student
+                existingStudents.push(testStudent);
+                localStorage.setItem("students", JSON.stringify(existingStudents));
+
+                document.getElementById("testResults").innerHTML = `
+                    <div class="result pass">✅ Test student added successfully!</div>
+                    <div class="result info">Student ID: ${testStudent.studentId}</div>
+                    <div class="result info">Name: ${testStudent.studentName}</div>
+                    <div class="result info">Department: ${testStudent.department}</div>
+                    <div class="result info">Year: ${testStudent.year}</div>
+                `;
+                
+                viewAllStudents();
+                
+            } catch (error) {
+                document.getElementById("testResults").innerHTML = `
+                    <div class="result fail">❌ Test failed: ${error.message}</div>
+                `;
+            }
+        }
+
+        // View all students
+        function viewAllStudents() {
+            try {
+                const students = JSON.parse(localStorage.getItem("students")) || [];
+                const studentsListDiv = document.getElementById("studentsList");
+                
+                if (students.length === 0) {
+                    studentsListDiv.innerHTML = '<div class="result info">No students found</div>';
+                    return;
+                }
+
+                let html = `<div class="result pass">Total Students: ${students.length}</div>`;
+                
+                // Group by department and year
+                const grouped = {};
+                students.forEach(s => {
+                    const key = `${s.department} - Year ${s.year}`;
+                    if (!grouped[key]) grouped[key] = [];
+                    grouped[key].push(s);
+                });
+
+                Object.keys(grouped).forEach(classKey => {
+                    const classStudents = grouped[classKey];
+                    html += `<div class="result info">
+                        <strong>${classKey}:</strong> ${classStudents.length} students<br>
+                        ${classStudents.map(s => `${s.studentId} - ${s.studentName || s.name}`).join('<br>')}
+                    </div>`;
+                });
+
+                studentsListDiv.innerHTML = html;
+
+            } catch (error) {
+                document.getElementById("studentsList").innerHTML = `
+                    <div class="result fail">❌ Error reading students: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Clear all students (for testing)
+        function clearAllStudents() {
+            if (confirm("Are you sure you want to clear all students? This is for testing only.")) {
+                localStorage.removeItem("students");
+                document.getElementById("studentsList").innerHTML = '<div class="result info">All students cleared</div>';
+                document.getElementById("testResults").innerHTML = '<div class="result info">Students database cleared</div>';
+            }
+        }
+
+        // Initialize default students for testing
+        function initializeTestStudents() {
+            const defaultStudents = [
+                { serial: 1, studentId: "21CS001", studentName: "Aravind Kumar", name: "Aravind Kumar", department: "Computer Science", year: "3" },
+                { serial: 2, studentId: "21CS002", studentName: "Bhavani S", name: "Bhavani S", department: "Computer Science", year: "3" },
+                { serial: 3, studentId: "21IT001", studentName: "Chandran M", name: "Chandran M", department: "Information Technology", year: "2" },
+                { serial: 4, studentId: "21TM001", studentName: "Divya R", name: "Divya R", department: "Tamil", year: "1" },
+                { serial: 5, studentId: "21EN001", studentName: "Ganesh P", name: "Ganesh P", department: "English", year: "1" }
+            ];
+
+            const existing = JSON.parse(localStorage.getItem("students")) || [];
+            if (existing.length === 0) {
+                localStorage.setItem("students", JSON.stringify(defaultStudents));
+            }
+        }
+
+        // Run on page load
+        window.onload = function() {
+            setupTestAdmin();
+            initializeTestStudents();
+            viewAllStudents();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Students Data</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dropdown-container {
+            max-width: 400px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .dropdown-header {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-header:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .dropdown-arrow {
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-arrow.rotated {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .dropdown-content.open {
+            max-height: 300px;
+        }
+
+        .dropdown-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .dropdown-dept-info {
+            display: flex;
+            align-items: center;
+            color: #333;
+        }
+
+        .dropdown-icon {
+            font-size: 18px;
+            margin-right: 12px;
+        }
+
+        .dropdown-dept-name {
+            font-weight: bold;
+        }
+
+        .dropdown-student-count {
+            background: #007bff;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        #studentsDataView table {
+            margin-top: 20px;
+        }
+
+        .back-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .back-btn:hover {
+            background-color: #545b62;
+        }
+
+        /* Mobile Responsive Table */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .table-responsive::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .table-responsive table {
+            min-width: 800px;
+        }
+
+        .table-responsive th, .table-responsive td {
+            font-size: 13px;
+            padding: 10px 8px;
+        }
+
+        /* Student Photo Styles */
+        .student-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #007bff;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .student-photo:hover {
+            transform: scale(1.1);
+        }
+
+        .student-photo-placeholder {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            border: 2px solid #007bff;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .student-photo-placeholder:hover {
+            transform: scale(1.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            color: white;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .close {
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #ffeb3b;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+            color: white;
+        }
+
+        .student-details-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .student-photo-large {
+            flex: 0 0 200px;
+        }
+
+        .student-photo-large img {
+            width: 200px;
+            height: 200px;
+            border-radius: 15px;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .student-photo-large .placeholder-large {
+            width: 200px;
+            height: 200px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            font-weight: bold;
+            color: white;
+            border: 4px solid white;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .student-info-details {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .detail-row {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .detail-value {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .view-details-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 13px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .view-details-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Mobile Responsive Modal */
+        @media screen and (max-width: 768px) {
+            .modal-content {
+                margin: 10px auto;
+                width: 95%;
+            }
+
+            .modal-header {
+                padding: 15px;
+            }
+
+            .modal-header h2 {
+                font-size: 20px;
+            }
+
+            .close {
+                font-size: 28px;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .student-details-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .student-photo-large {
+                width: 100%;
+            }
+
+            .student-photo-large img, .student-photo-large .placeholder-large {
+                width: 100%;
+                height: 150px;
+            }
+
+            .student-photo-large .placeholder-large {
+                font-size: 60px;
+            }
+
+            .detail-row {
+                margin-bottom: 15px;
+                padding: 10px;
+            }
+
+            .detail-label {
+                font-size: 12px;
+            }
+
+            .detail-value {
+                font-size: 15px;
+            }
+
+            .table-responsive {
+                margin-bottom: 15px;
+            }
+
+            .table-responsive table {
+                min-width: 600px;
+            }
+
+            .table-responsive th, .table-responsive td {
+                font-size: 11px;
+                padding: 8px 6px;
+            }
+        }
+
+        /* Tablet Responsive */
+        @media screen and (min-width: 769px) and (max-width: 1024px) {
+            .table-responsive table {
+                min-width: 700px;
+            }
+
+            .table-responsive th, .table-responsive td {
+                font-size: 12px;
+                padding: 10px 8px;
+            }
+        }
+
+        /* Edit Student Form Styles */
+        .edit-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .edit-form-group {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        .edit-form-group.full-width {
+            grid-column: span 2;
+        }
+        .edit-form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #f1f5f9;
+        }
+        .edit-form-group input,
+        .edit-form-group select,
+        .edit-form-group textarea {
+            padding: 9px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 14px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        .edit-form-group input:focus,
+        .edit-form-group select:focus,
+        .edit-form-group textarea:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
+        }
+        .edit-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        @media screen and (max-width: 600px) {
+            .edit-form-grid {
+                grid-template-columns: 1fr;
+            }
+            .edit-form-group.full-width {
+                grid-column: span 1;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+    <header class="header">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h2 class="center" style="padding-left: 35%;">College Attendance System</h2>
+    </header>
+
+    <div class="container">
+        <h2 id="userInfo" class="center"></h2>
+        <h3 id="pageTitle" class="center" style="color: white;"></h3>
+
+        <!-- Department Selection View -->
+        <div id="departmentSelection" class="center">
+            <h4 style="color: white; margin: 30px 0;">Select Department to View Students:</h4>
+            
+            <div class="dropdown-container">
+                <div class="dropdown-header" onclick="toggleDropdown()">
+                    <span id="selectedDeptText">Choose Department</span>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+                <div id="departmentDropdown" class="dropdown-content">
+                    <!-- Department options will be generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Data View -->
+        <div id="studentsDataView" style="display: none;">
+            <div class="center" style="margin: 20px 0;">
+                <div id="selectedDeptInfo" style="color: white; font-size: 18px; font-weight: bold; margin-bottom: 15px;"></div>
+                
+                <div style="margin: 10px 0;">
+                    <label for="dataYear" style="color: white; margin-right: 10px;">Filter by Year:</label>
+                    <select id="dataYear" style="margin-right: 20px;">
+                        <option value="">All Years</option>
+                        <option value="1">Year 1</option>
+                        <option value="2">Year 2</option>
+                        <option value="3">Year 3</option>
+                    </select>
+                    <button onclick="applyYearFilter()">Apply Filter</button>
+                    <button onclick="downloadStudentsData()" style="background-color: #28a745;">Download Data</button>
+                    <button id="bulkDeleteBtn" onclick="deleteAllClassStudents()" class="red" style="display: none; background-color: #dc2626;">🗑️ Delete All Students</button>
+                </div>
+            </div>
+
+            <div id="studentsStats" class="center" style="margin: 15px 0; color: white; font-weight: bold;"></div>
+
+            <div class="table-responsive">
+                <table id="studentsTable">
+                    <thead id="studentsHead">
+                        <tr>
+                            <th>S.No</th>
+                            <th>Photo</th>
+                            <th>Reg. No</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Year</th>
+                            <th>Full Details</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsBody"></tbody>
+                </table>
+            </div>
+
+            <div class="center" style="margin: 20px 0;">
+                <button onclick="goBackToDepartments()" style="margin-right: 10px;">← Back to Departments</button>
+                <button onclick="goBackToAdmin()">Back to Admin Panel</button>
+            </div>
+        </div>
+
+        <div id="messageArea" class="center" style="margin-top: 20px; color: white; font-weight: bold;">
+            <!-- Messages will appear here -->
+        </div>
+    </div>
+
+    <!-- Student Details Modal -->
+    <div id="studentDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 Student Full Details</h2>
+                <span class="close" onclick="closeStudentModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="student-details-container" id="modalStudentDetails">
+                    <!-- Details will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Student Modal (CS1 Staff Only) -->
+    <div id="editStudentModal" class="modal">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header">
+                <h2>✏️ Edit Student Details</h2>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editStudentForm" onsubmit="event.preventDefault(); saveStudentChanges();">
+                    <input type="hidden" id="editOriginalId">
+                    <div class="edit-form-grid">
+                        <div class="edit-form-group">
+                            <label for="editStudentId">Register Number / ID *</label>
+                            <input type="text" id="editStudentId" required>
+                        </div>
+                        <div class="edit-form-group">
+                            <label for="editStudentName">Student Name *</label>
+                            <input type="text" id="editStudentName" required>
+                        </div>
+                        <div class="edit-form-group">
+                            <label for="editDepartment">Department *</label>
+                            <select id="editDepartment" required>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Tamil">Tamil</option>
+                                <option value="English">English</option>
+                            </select>
+                        </div>
+                        <div class="edit-form-group">
+                            <label for="editYear">Year *</label>
+                            <select id="editYear" required>
+                                <option value="1">Year 1</option>
+                                <option value="2">Year 2</option>
+                                <option value="3">Year 3</option>
+                            </select>
+                        </div>
+                        <div class="edit-form-group">
+                            <label for="editEmail">Email Address</label>
+                            <input type="email" id="editEmail" placeholder="student@college.edu">
+                        </div>
+                        <div class="edit-form-group">
+                            <label for="editPhone">Phone Number</label>
+                            <input type="tel" id="editPhone" placeholder="10-digit number">
+                        </div>
+                        <div class="edit-form-group">
+                            <label for="editDob">Date of Birth</label>
+                            <input type="date" id="editDob">
+                        </div>
+                        <div class="edit-form-group">
+                            <label for="editStatus">Status</label>
+                            <select id="editStatus">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="edit-form-group">
+                            <label for="editParentName">Parent / Guardian Name</label>
+                            <input type="text" id="editParentName">
+                        </div>
+                        <div class="edit-form-group">
+                            <label for="editParentPhone">Parent Phone</label>
+                            <input type="tel" id="editParentPhone">
+                        </div>
+                        <div class="edit-form-group full-width">
+                            <label>Student Photo (Upload from System / Computer)</label>
+                            <input type="hidden" id="editPhoto">
+                            <input type="file" id="editPhotoFile" accept="image/*" onchange="handleImageUpload(event)" style="display: none;">
+                            
+                            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 8px;">
+                                <button type="button" onclick="document.getElementById('editPhotoFile').click()" style="background-color: #0284c7; color: white; padding: 8px 16px; font-size: 13px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                    📁 Browse Image from System
+                                </button>
+                                <button type="button" class="red" onclick="clearPhoto()" style="padding: 8px 14px; font-size: 13px; border: none; border-radius: 6px; cursor: pointer;">
+                                    ✕ Remove Photo
+                                </button>
+                            </div>
+
+                            <div id="photoPreviewContainer" style="display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.25); padding: 10px 14px; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.35);">
+                                <img id="photoPreviewImg" src="" alt="Preview" style="width: 65px; height: 65px; border-radius: 8px; object-fit: cover; border: 2px solid white; display: none;">
+                                <div id="photoPreviewPlaceholder" style="width: 65px; height: 65px; border-radius: 8px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 26px; color: white;">📷</div>
+                                <div style="flex: 1;">
+                                    <div id="photoStatusText" style="font-size: 13px; font-weight: 500; color: #e2e8f0;">No image chosen yet</div>
+                                    <div style="font-size: 11px; color: #cbd5e1; margin-top: 3px;">Choose any photo (JPG, PNG, WEBP) from your computer</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="edit-form-group full-width">
+                            <label for="editAddress">Address</label>
+                            <textarea id="editAddress" rows="2" style="resize: vertical;"></textarea>
+                        </div>
+                    </div>
+                    <div class="edit-form-actions">
+                        <button type="button" class="red" onclick="closeEditModal()" style="padding: 10px 20px; font-size: 14px; border-radius: 6px; cursor: pointer;">Cancel</button>
+                        <button type="submit" style="background-color: #28a745; color: white; padding: 10px 24px; font-size: 14px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer;">💾 Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <center>
+        <button onclick="goBackToAdmin()">Back to Dashboard</button>
+    </center>
+    <script src="studentsdata.js"></script>
+
+</body>
+
+</html>
